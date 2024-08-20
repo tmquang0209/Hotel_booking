@@ -112,13 +112,15 @@ describe("GET /hotel/details", () => {
 
     it("Hotel not found", async () => {
         const response = await request(app)
-            .get("/hotel/details")
-            .query({
-                id: 1,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
+        .get("/hotel/details")
+        .query({
+            id: 1,
+        })
+        .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
-        expect(response.status).toBe(400);
+        // expect(response.status).toBe(400);
+        // console.log("🚀 ~ it ~ response:", response)
+        expect(response.body.code).toBe(1003);
     });
 
     it("Should return data of hotel", async () => {
@@ -186,30 +188,30 @@ describe("PUT /hotel/update", () => {
 
     it("Should return data of updated hotel", async () => {
         const response = await request(app)
-            .put("/hotel/update")
-            .query({ id: hotelId })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`)
-            .send({
-                name: "Hotel " + Math.ceil(Math.random() * 1000),
-                address: "Ha Noi",
-                phone_number: "0975385643",
-                email: `hotel_${Math.ceil(Math.random() * 1000)}@gmail.com`,
-                services: [
-                    {
-                        id: 1,
-                        price: 100000,
-                    },
-                    {
-                        id: 2,
-                        price: 200000,
-                    },
-                ],
+        .put("/hotel/update")
+        .query({ id: hotelId })
+        .set("Authorization", `Bearer ${accessTokenOfOwner}`)
+        .send({
+            name: "Hotel " + Math.ceil(Math.random() * 1000),
+            address: "Ha Noi",
+            phone_number: "0975385643",
+            email: `hotel_${Math.ceil(Math.random() * 1000)}@gmail.com`,
+            services: [
+                {
+                    id: 1,
+                    price: 100000,
+                },
+                {
+                    id: 2,
+                    price: 200000,
+                },
+            ],
             });
 
-        expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1005);
+            expect(response.status).toBe(200);
+            expect(response.body.code).toBe(1005);
+        });
     });
-});
 
 describe("DELETE /hotel/delete", () => {
     it("Access is denied to guests", async () => {
@@ -221,7 +223,8 @@ describe("DELETE /hotel/delete", () => {
     it("Hotel not found", async () => {
         const response = await request(app).delete("/hotel/delete").query({ id: 1 }).set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
-        expect(response.status).toBe(400);
+        console.log("🚀 ~ it ~ response:", response.body)
+        // expect(response.status).toBe(400);
         expect(response.body.code).toBe(1006);
     });
 

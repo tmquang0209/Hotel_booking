@@ -1,7 +1,10 @@
 import Booking from "../models/booking.js";
+import BookingRooms from "../models/bookingRooms.js";
 import BookingServices from "../models/bookingServices.js";
+import HotelServiceModel from "../models/hotelService.js";
 import Invoices from "../models/invoices.js";
 import Rooms from "../models/rooms.js";
+import ApiException from "../utils/apiException.js";
 
 class BookingService {
     static async createBooking(data) {
@@ -17,7 +20,7 @@ class BookingService {
         return { total, days };
     }
 
-    static async addRooms(bookingId, rooms) {
+    static async addRooms(bookingId, hotelId, rooms) {
         let totalRoomPrice = 0;
         for (const room of rooms) {
             const roomDetails = await Rooms.query()
@@ -43,11 +46,11 @@ class BookingService {
         return { totalRoomPrice };
     }
 
-    static async addServices(bookingId, services) {
+    static async addServices(bookingId, hotelId, services) {
         let totalServicePrice = 0;
         for (const service of services) {
-            const serviceDetails = await HotelService.query().findOne({
-                hotel_id: hotel_id,
+            const serviceDetails = await HotelServiceModel.query().findOne({
+                hotel_id: hotelId,
                 service_id: service.id,
             });
 
@@ -75,16 +78,25 @@ class BookingService {
     }
 
     static async getBookingDetails(bookingId, user) {
+        const checkExists = await Booking.query().findById(bookingId);
+        if (!checkExists) {
+            throw new ApiException(1005, "Booking with id " + bookingId + " isn't exists.", null);
+        }
+
         if (user.type === "OWNER") {
             const details = await Booking.query().withGraphJoined("rooms").withGraphJoined("services").withGraphJoined("invoice").findOne({
                 "booking.id": bookingId,
-                "hotels.owner_id": user.id,
             });
+            // check hotel owner
+            // if (details.rooms[0].hotel.owner_id !== user.id) {
+            //     throw new ApiException(1005, "Access denied.", null);
+            // }
+
             return details;
         } else if (user.type === "GUEST") {
             const details = await Booking.query().withGraphJoined("rooms").withGraphJoined("services").withGraphJoined("invoice").findOne({
-                id: bookingId,
-                guest_id: user.id,
+                "booking.id": bookingId,
+                "booking.guest_id": user.id,
             });
             return details;
         }

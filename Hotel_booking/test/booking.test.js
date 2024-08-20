@@ -35,11 +35,11 @@ describe("POST /booking/create", () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotel_id: 2,
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: 2,
-                num_children: 0,
+                hotelId: 2,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 2,
+                numChildren: 0,
                 rooms: [
                     {
                         type: "VIP",
@@ -52,7 +52,7 @@ describe("POST /booking/create", () => {
                         quantity: 2,
                     },
                 ],
-                payment_method: "cash",
+                paymentMethod: "cash",
             })
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
@@ -64,14 +64,14 @@ describe("POST /booking/create", () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotel_id: 2,
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: "2",
-                num_children: 0,
+                hotelId: 2,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 2,
+                numChildren: 0,
                 rooms: [
                     {
-                        type: "VaIP",
+                        type: "VIaP",
                         qty: 1,
                     },
                 ],
@@ -81,7 +81,7 @@ describe("POST /booking/create", () => {
                         quantity: 2,
                     },
                 ],
-                payment_method: "cash",
+                paymentMethod: "cash",
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
@@ -92,11 +92,11 @@ describe("POST /booking/create", () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotel_id: 100,
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: 2,
-                num_children: 0,
+                hotelId: 21111,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 2,
+                numChildren: 0,
                 rooms: [
                     {
                         type: "VIP",
@@ -109,27 +109,27 @@ describe("POST /booking/create", () => {
                         quantity: 2,
                     },
                 ],
-                payment_method: "cash",
+                paymentMethod: "cash",
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1001);
+        expect(response.body.code).toBe(1006);
     });
 
     it("Full room", async () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotel_id: 2,
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: 2,
-                num_children: 0,
+                hotelId: 2,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 2,
+                numChildren: 0,
                 rooms: [
                     {
                         type: "VIP",
-                        qty: 100,
+                        qty: 1,
                     },
                 ],
                 services: [
@@ -138,7 +138,7 @@ describe("POST /booking/create", () => {
                         quantity: 2,
                     },
                 ],
-                payment_method: "cash",
+                paymentMethod: "cash",
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
@@ -150,11 +150,11 @@ describe("POST /booking/create", () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotel_id: 10,
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: 2,
-                num_children: 0,
+                hotelId: 10,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 2,
+                numChildren: 0,
                 rooms: [
                     {
                         type: "VIP",
@@ -163,11 +163,11 @@ describe("POST /booking/create", () => {
                 ],
                 services: [
                     {
-                        id: 100,
+                        id: 10110,
                         quantity: 2,
                     },
                 ],
-                payment_method: "cash",
+                paymentMethod: "cash",
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
@@ -179,11 +179,11 @@ describe("POST /booking/create", () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotel_id: 10,
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: 2,
-                num_children: 0,
+                hotelId: 10,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 2,
+                numChildren: 0,
                 rooms: [
                     {
                         type: "VIP",
@@ -196,7 +196,7 @@ describe("POST /booking/create", () => {
                         quantity: 2,
                     },
                 ],
-                payment_method: "cash",
+                paymentMethod: "cash",
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
@@ -246,10 +246,11 @@ describe("PUT /booking/update", () => {
             .put("/booking/update")
             .query({ id: 1 })
             .send({
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: 2,
-                num_children: 0,
+                hotelId: 10,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 2,
+                numChildren: 0,
                 rooms: [
                     {
                         type: "VIP",
@@ -275,10 +276,11 @@ describe("PUT /booking/update", () => {
             .put("/booking/update")
             .query({ id: 1 })
             .send({
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: "2",
-                num_children: 0,
+                hotelId: 10,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: "2",
+                numChildren: 0,
                 rooms: [
                     {
                         type: "VaIP",
@@ -302,13 +304,14 @@ describe("PUT /booking/update", () => {
         const response = await request(app)
             .put("/booking/update")
             .query({
-                id: 100,
+                id: -1,
             })
             .send({
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: 2,
-                num_children: 0,
+                hotelId: 10,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 2,
+                numChildren: 0,
                 rooms: [
                     {
                         type: "VIP",
@@ -321,7 +324,7 @@ describe("PUT /booking/update", () => {
                         quantity: 2,
                     },
                 ],
-                payment_method: "cash",
+                paymentMethod: "cash",
             })
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
@@ -334,10 +337,11 @@ describe("PUT /booking/update", () => {
             .put("/booking/update")
             .query({ id: 1 })
             .send({
-                arrival_date: "2024-04-28 18:00:00", //
-                departure_date: "2024-04-29 15:00:00",
-                num_adults: 3,
-                num_children: 1,
+                hotelId: 10,
+                arrivalDate: "2024-04-28 18:00:00", //
+                departureDate: "2024-04-29 15:00:00",
+                numAdults: 3,
+                numChildren: 1,
                 rooms: [
                     {
                         type: "VIP",
@@ -350,7 +354,7 @@ describe("PUT /booking/update", () => {
                         quantity: 3,
                     },
                 ],
-                payment_method: "cash",
+                paymentMethod: "cash",
             })
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
@@ -409,14 +413,14 @@ describe("PUT /booking/update-payment", () => {
 
     it("Update payment successfully", async () => {
         const response = await request(app)
-        .put("/booking/update-payment")
-        .query({
-            id: 2,
-        })
-        .send({
-            status: "FAIL",
-        })
-        .set("Authorization", `Bearer ${accessTokenOfOwner}`);
+            .put("/booking/update-payment")
+            .query({
+                id: 2,
+            })
+            .send({
+                status: "FAIL",
+            })
+            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
         expect(response.body.code).toBe(1011);

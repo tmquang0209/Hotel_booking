@@ -1,8 +1,5 @@
-import Rooms from "../models/rooms.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import Exception from "../utils/exception.js";
-import ApiException from "../utils/apiException.js";
-import Hotels from "../models/hotels.js";
 import HotelService from "../services/hotelService.js";
 import RoomService from "../services/roomService.js";
 
@@ -10,7 +7,7 @@ export async function createRoom(req, res) {
     const { hotel_id, name, price, description, type, occupancy, status } = req.body;
     const user = req.user;
     try {
-        await HotelService.checkExists(user.id, hotel_id);
+        await HotelService.checkExists(hotel_id, user.id);
 
         await RoomService.checkExists(hotel_id, name);
 

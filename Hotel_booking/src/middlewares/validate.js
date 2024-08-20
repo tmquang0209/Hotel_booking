@@ -86,18 +86,18 @@ var roomValidation = [
 ];
 
 var bookingValidation = [
-    check("arrival_date").isISO8601().withMessage("Arrival date must be a date"),
-    check("departure_date")
+    check("arrivalDate").isISO8601().withMessage("Arrival date must be a date"),
+    check("departureDate")
         .isISO8601()
         .withMessage("Departure date must be a date")
         .custom((value, { req }) => {
-            if (value < req.body.arrival_date) {
+            if (value < req.body.arrivalDate) {
                 throw new Error("Departure date must be after arrival date");
             }
             return true;
         }),
-    check("num_adults").isNumeric().withMessage("Number of adults must be a number"),
-    check("num_children").isNumeric().withMessage("Number of children must be a number"),
+    check("numAdults").isNumeric().withMessage("Number of adults must be a number"),
+    check("numChildren").isNumeric().withMessage("Number of children must be a number"),
     check("rooms")
         .isArray()
         .withMessage("Rooms must be an array")
@@ -114,7 +114,7 @@ var bookingValidation = [
             return true;
         }),
     check("services").isArray().withMessage("Services must be an array"),
-    check("payment_method")
+    check("paymentMethod")
         .isString()
         .withMessage("Payment method must be a string")
         .custom((value) => {

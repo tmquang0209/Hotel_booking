@@ -6,7 +6,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from ".
 import ManageAccess from "../models/manageAccess.js";
 
 class UserService {
-    static async validateUser(username, password) {
+    static async validateUser(username, password = null) {
         const [ownerData, guestData] = await Promise.all([Owners.query().findOne({ username }), Guests.query().findOne({ username })]);
 
         if (!ownerData && !guestData) {
@@ -14,10 +14,10 @@ class UserService {
         }
 
         const user = ownerData ? { ...ownerData, type: "OWNER" } : { ...guestData, type: "GUEST" };
-
-        if (!(await comparePassword(password, user.password))) {
-            throw new ApiException(1001, "Password is incorrect", null);
-        }
+        if (password)
+            if (!(await comparePassword(password, user.password))) {
+                throw new ApiException(1001, "Password is incorrect", null);
+            }
 
         return user;
     }

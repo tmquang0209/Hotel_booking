@@ -11,7 +11,7 @@ import BookingService from "../services/bookingService.js";
 
 // create
 export async function createBooking(req, res) {
-    const { hotel_id, arrival_date, departure_date, num_adults, num_children, rooms, services, payment_method } = req.body;
+    const { hotelId, arrivalDate, departureDate, numAdults, numChildren, rooms, services, paymentMethod } = req.body;
     const user = req.user;
     let totalPrice = 0,
         totalServicePrice = 0,
@@ -19,49 +19,49 @@ export async function createBooking(req, res) {
 
     try {
         // check hotel
-        await HotelService.checkExists(hotel_id);
+        await HotelService.checkExists(hotelId);
 
         // check room availability
         for (const room of rooms) {
-            await RoomService.checkAvailability(hotel_id, room.type, room.qty);
+            await RoomService.checkAvailability(hotelId, room.type, room.qty);
         }
 
         // check service availability
-        await HotelService.checkServiceExists(hotel_id, services);
+        await HotelService.checkServiceExists(hotelId, services);
 
         // create booking
         const bookingData = {
             guest_id: user.id,
-            hotel_id,
-            arrival_date,
-            departure_date,
-            num_adults,
-            num_children,
+            hotel_id: hotelId,
+            arrival_date: arrivalDate,
+            departure_date: departureDate,
+            num_adults: numAdults,
+            num_children: numChildren,
         };
 
         const booking = await BookingService.createBooking(bookingData);
 
         // create booking details
         if (rooms) {
-            const roomDetails = await BookingService.addRooms(booking.id, rooms);
+            const roomDetails = await BookingService.addRooms(booking.id, hotelId, rooms);
 
             totalRoomPrice += roomDetails.totalRoomPrice;
         }
 
         if (services) {
-            const serviceDetails = await BookingService.addServices(booking.id, services);
+            const serviceDetails = await BookingService.addServices(booking.id, hotelId, services);
 
             totalServicePrice += serviceDetails.totalServicePrice;
         }
 
         // calculate invoice
-        const invoiceDetails = await BookingService.calculateInvoice(arrival_date, departure_date, totalRoomPrice, totalServicePrice);
+        const invoiceDetails = await BookingService.calculateInvoice(arrivalDate, departureDate, totalRoomPrice, totalServicePrice);
 
         totalPrice = invoiceDetails.total;
         const days = invoiceDetails.days;
 
         // create invoice
-        await BookingService.createInvoice(user, booking.id, totalPrice, payment_method);
+        await BookingService.createInvoice(user, booking.id, totalPrice, paymentMethod);
 
         const data = await BookingService.getBookingDetails(booking.id, user);
 
@@ -97,35 +97,38 @@ export async function getBookingList(req, res) {
 // update
 export async function updateBooking(req, res) {
     const { id } = req.query;
-    const { arrival_date, departure_date, num_adults, num_children, rooms, services } = req.body;
+    const bookingId = parseInt(id);
+    const { hotelId, arrivalDate, departureDate, numAdults, numChildren, rooms, services } = req.body;
     const user = req.user;
     try {
-        await BookingService.getBookingDetails(id, user);
+        await HotelService.checkExists(hotelId, user.id);
+        await BookingService.getBookingDetails(bookingId, user);
 
         const dataUpdate = {
-            arrival_date,
-            departure_date,
-            num_adults,
-            num_children,
+            arrival_date: arrivalDate,
+            departure_date: departureDate,
+            num_adults: numAdults,
+            num_children: numChildren,
         };
 
-        await BookingService.updateBookingDetails(id, dataUpdate);
-
+        await BookingService.updateBookingDetails(bookingId, dataUpdate);
+        let totalRoomPrice = 0,
+            totalServicePrice = 0;
         if (rooms) {
-            await BookingService.deleteBookingRoom(id);
-            const roomDetails = await BookingService.addRooms(id, rooms);
+            await BookingService.deleteBookingRoom(bookingId);
+            const roomDetails = await BookingService.addRooms(bookingId, hotelId, rooms);
 
             totalRoomPrice += roomDetails.totalRoomPrice;
         }
 
         if (services) {
-            await BookingService.deleteBookingService(id);
-            const serviceDetails = await BookingService.addServices(id, services);
+            await BookingService.deleteBookingService(bookingId);
+            const serviceDetails = await BookingService.addServices(bookingId, hotelId, services);
 
             totalServicePrice += serviceDetails.totalServicePrice;
         }
 
-        const data = await BookingService.getBookingDetails(id, user);
+        const data = await BookingService.getBookingDetails(bookingId, user);
 
         return res.json(apiResponse(1008, "Booking updated successfully", data));
     } catch (error) {

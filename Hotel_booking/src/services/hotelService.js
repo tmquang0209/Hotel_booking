@@ -1,5 +1,6 @@
 import Hotels from "../models/hotels.js";
 import HotelServiceModel from "../models/hotelService.js";
+import ApiException from "../utils/apiException.js";
 
 class HotelService {
     static async create(data, services) {
@@ -26,17 +27,15 @@ class HotelService {
         });
 
         if (!details) {
-            throw new ApiException(1003, "Hotel with id " + id + " isn't exists.", null);
+            throw new ApiException(1003, "Hotel with id " + hotelId + " isn't exists.", null);
         }
 
         return details;
     }
 
-    static async checkExists(userId, hotelId) {
-        const details = await Hotels.query().findOne({
-            id: hotelId,
-            owner_id: userId,
-        });
+    static async checkExists(hotelId, userId = null) {
+        const filter = userId ? { id: hotelId, owner_id: userId } : { id: hotelId };
+        const details = await Hotels.query().findOne(filter);
 
         if (!details) {
             throw new ApiException(1006, "Can not find this hotel.", null);
@@ -51,10 +50,10 @@ class HotelService {
     }
 
     static async updateInfo(data, services, hotelId) {
-        const update = await Hotels.query().patchAndFetchById(id, data);
+        const update = await Hotels.query().patchAndFetchById(hotelId, data);
 
         if (services) {
-            await HotelServiceModel.query().delete().where("hotel_id", id);
+            await HotelServiceModel.query().delete().where("hotel_id", hotelId);
             for (const item of services) {
                 const serviceData = {
                     hotel_id: update.id,
@@ -77,7 +76,7 @@ class HotelService {
     }
 
     static async checkServiceExists(hotelId, services) {
-        const availableServices = await HotelService.query()
+        const availableServices = await HotelServiceModel.query()
             .whereIn("service_id", [...services.map((service) => service.id)])
             .where("hotel_id", hotelId);
         if (availableServices.length !== services.length) {

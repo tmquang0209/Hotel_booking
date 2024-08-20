@@ -127,9 +127,9 @@ describe("Auth API", () => {
     describe("POST /refresh-token", () => {
         it("Should return new access token", async () => {
             const response = await request(app)
-                .post("/auth/refresh-token")
-                .set("Cookie", "refreshToken=" + refreshToken)
-                .set("Authorization", "Bearer " + accessToken);
+            .post("/auth/refresh-token")
+            .set("Cookie", "refreshToken=" + refreshToken)
+            .set("Authorization", "Bearer " + accessToken);
 
             expect(response.status).toBe(200);
             expect(response.body.data).toHaveProperty("accessToken");

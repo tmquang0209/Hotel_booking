@@ -43,7 +43,7 @@ async function refreshTokenController(req, res) {
 
         const { payload, newRefreshToken } = await UserService.verifyAndRefreshToken(refreshToken);
 
-        const user = await UserService.validateUser(payload.username, payload.password);
+        const user = await UserService.validateUser(payload.username);
 
         const accessToken = UserService.generateTokens(user).accessToken;
 

@@ -51,7 +51,7 @@ export async function updateHotelInfo(req, res) {
     const { name, address, phone_number, email, status, services } = req.body;
     const user = req.user;
     try {
-        await HotelService.checkExists(user.id, id);
+        await HotelService.checkExists(id, user.id);
 
         const data = {
             name: name,
@@ -73,7 +73,7 @@ export async function deleteHotel(req, res) {
     const { id } = req.query;
     const user = req.user;
     try {
-        await HotelService.checkExists(user.id, id);
+        await HotelService.checkExists(id, user.id);
 
         const deleteData = await HotelService.deleteHotel(id);
         return res.json(apiResponse(1007, "Delete hotel successful.", deleteData));
