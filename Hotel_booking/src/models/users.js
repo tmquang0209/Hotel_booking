@@ -1,8 +1,8 @@
 import { Model } from "objection";
 
-class Owners extends Model {
+class Users extends Model {
     static get tableName() {
-        return "owners";
+        return "users";
     }
 
     static get jsonSchema() {
@@ -19,10 +19,11 @@ class Owners extends Model {
                 birthday: { type: "string", format: "date" },
                 address: { type: "string", maxLength: 100 },
                 status: { type: "boolean" },
+                role: { type: "string", maxLength: 10 },
                 create_at: { type: "string", format: "date-time" },
             },
         };
     }
 }
 
-export default Owners;
+export default Users;

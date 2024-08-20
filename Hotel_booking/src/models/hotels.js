@@ -30,8 +30,8 @@ class Hotels extends Model {
                 relation: Model.HasManyRelation,
                 modelClass: Rooms,
                 join: {
-                    from: "hotels.id",
-                    to: "rooms.hotel_id",
+                    from: this.tableName + ".id",
+                    to: Rooms.tableName + ".hotel_id",
                 },
             },
 
