@@ -5,8 +5,8 @@
 exports.up = function (knex) {
     return knex.schema.createTable("booking_rooms", (table) => {
         table.collate("utf8_general_ci");
-        table.integer("booking_id").notNullable();
-        table.integer("room_id").notNullable();
+        table.integer("booking_id").unsigned().notNullable();
+        table.integer("room_id").unsigned().notNullable();
         table.datetime("create_at").defaultTo(knex.fn.now());
         table.primary(["booking_id", "room_id"]);
     });
