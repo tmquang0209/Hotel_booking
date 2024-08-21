@@ -6,11 +6,11 @@ import authorize from "../middlewares/authorization.js";
 
 const bookingRouter = express.Router();
 
-bookingRouter.post("/create", authorize(["GUEST"]),bookingValidation, validateError, createBooking);
+bookingRouter.post("/create", authorize(["GUEST"]), bookingValidation, validateError, createBooking);
 
 bookingRouter.get("/details", getBookingDetails);
 
-bookingRouter.get("/list", authorize(["OWNER"]), getBookingList);
+bookingRouter.get("/list", getBookingList);
 
 bookingRouter.put("/update", authorize(["OWNER"]), bookingValidation, validateError, updateBooking);
 

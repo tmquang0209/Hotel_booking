@@ -1,54 +1,34 @@
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import ApiException from "../utils/apiException.js";
-import Owners from "../models/owners.js";
-import Guests from "../models/guests.js";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.js";
 import ManageAccess from "../models/manageAccess.js";
+import Users from "../models/users.js";
 
 class UserService {
     static async validateUser(username, password = null) {
-        const [ownerData, guestData] = await Promise.all([Owners.query().findOne({ username }), Guests.query().findOne({ username })]);
-
-        if (!ownerData && !guestData) {
-            throw new ApiException(1001, "Username is incorrect", null);
+        const user = await Users.query().findOne({ username });
+        if (!user) {
+            throw new ApiException(1002, "User not found", null);
         }
 
-        const user = ownerData ? { ...ownerData, type: "OWNER" } : { ...guestData, type: "GUEST" };
-        if (password)
-            if (!(await comparePassword(password, user.password))) {
-                throw new ApiException(1001, "Password is incorrect", null);
-            }
+        if (password && !(await comparePassword(password, user.password))) {
+            throw new ApiException(1001, "Password is incorrect", null);
+        }
 
         return user;
     }
 
-    static async createUser({ username, password, email, full_name, address, phone_number, type }) {
-        const encryptPassword = await hashPassword(password);
-        const [ownerData, guestData] = await Promise.all([Owners.query().findOne({ username }), Guests.query().findOne({ username })]);
-
-        if (ownerData || guestData) {
+    static async createUser(data) {
+        const user = await Users.query().findOne({ username: data.username });
+        if (user) {
             throw new ApiException(1003, "Username already exists", null);
         }
 
-        if (type === "OWNER") {
-            return Owners.query().insert({
-                username,
-                password: encryptPassword,
-                email,
-                full_name,
-                address,
-                phone_number,
-            });
-        } else {
-            return Guests.query().insert({
-                username,
-                password: encryptPassword,
-                email,
-                full_name,
-                address,
-                phone_number,
-            });
-        }
+        const encryptPassword = await hashPassword(data.password);
+
+        const newUser = await Users.query().insert({ ...data, password: encryptPassword });
+
+        return newUser;
     }
 
     static generateTokens(user) {
@@ -113,62 +93,25 @@ class UserService {
     }
 
     static async getUserDetails(user) {
-        if (user.type === "OWNER") {
-            var userInfo = await Owners.query().findOne({
-                id: user.id,
-                username: user.username,
-            });
-            var type = "OWNER";
-        } else if (user.type === "GUEST") {
-            var userInfo = await Guests.query().findOne({
-                id: user.id,
-                username: user.username,
-            });
-            var type = "GUEST";
-        }
-
-        return { ...userInfo, type: type };
+        const userInfo = await Users.query().findById(user.id);
+        return userInfo;
     }
 
-    static async updateUserInfo(user, { full_name, email, address, birthday, phone_number }) {
-        if (user.type === "OWNER") {
-            var userInfo = await Owners.query().patchAndFetchById(user.id, {
-                full_name: full_name,
-                address: address,
-                email: email,
-                phone_number: phone_number,
-                birthday: birthday,
-            });
-            var type = "OWNER";
-        } else if (user.type === "GUEST") {
-            var userInfo = await Guests.query().patchAndFetchById(user.id, {
-                full_name: full_name,
-                address: address,
-                email: email,
-                phone_number: phone_number,
-                birthday: birthday,
-            });
-            var type = "GUEST";
-        }
+    static async updateUserInfo(user, data) {
+        const userInfo = await Users.query().patchAndFetchById(user.id, data);
 
-        return { ...userInfo, type: type };
+        return userInfo;
     }
 
-    static async changePassword(user, { old_password, new_password }) {
-        if (!(await comparePassword(old_password, user.password))) {
+    static async changePassword(user, { oldPassword, newPassword }) {
+        if (!(await comparePassword(oldPassword, user.password))) {
             throw new ApiException(1003, "Old password is incorrect");
         }
 
-        const encryptPassword = await hashPassword(new_password);
-        if (user.type === "OWNER") {
-            await Owners.query().patchAndFetchById(user.id, {
-                password: encryptPassword,
-            });
-        } else if (user.type === "GUEST") {
-            await Guests.query().patchAndFetchById(user.id, {
-                password: encryptPassword,
-            });
-        }
+        const encryptPassword = await hashPassword(newPassword);
+        const change = await Users.query().patchAndFetchById(user.id, { password: encryptPassword }).where("id", user.id);
+
+        return change;
     }
 }
 

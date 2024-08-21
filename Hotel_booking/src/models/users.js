@@ -19,7 +19,7 @@ class Users extends Model {
                 birthday: { type: "string", format: "date" },
                 address: { type: "string", maxLength: 100 },
                 status: { type: "boolean" },
-                role: { type: "string", maxLength: 10 },
+                type: { type: "string", maxLength: 10 },
                 create_at: { type: "string", format: "date-time" },
             },
         };

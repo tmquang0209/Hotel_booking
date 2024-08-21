@@ -23,9 +23,19 @@ async function loginController(req, res) {
 
 async function signupController(req, res) {
     try {
-        const { username, password, email, full_name, address, phone_number, type } = req.body;
+        const { username, password, email, fullName, address, phoneNumber, type } = req.body;
 
-        const user = await UserService.createUser({ username, password, email, full_name, address, phone_number, type });
+        const data = {
+            username,
+            password,
+            email,
+            full_name: fullName,
+            address,
+            phone_number: phoneNumber,
+            type,
+        };
+
+        const user = await UserService.createUser(data);
 
         return res.json(apiResponse(1004, "Signup successfully", user));
     } catch (error) {

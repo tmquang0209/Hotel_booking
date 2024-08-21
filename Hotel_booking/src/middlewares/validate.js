@@ -10,7 +10,7 @@ var loginValidation = [
 var signupValidation = [
     check("username").isString().withMessage("Username must be string").notEmpty().withMessage("Username cannot be empty"),
     check("password").isString().withMessage("Password must be string").notEmpty().withMessage("Password cannot be empty"),
-    check("confirm_password").custom((value, { req }) => {
+    check("confirmPassword").custom((value, { req }) => {
         if (value !== req.body.password) {
             throw new Error("Password and confirm password must be the same");
         }
@@ -27,24 +27,24 @@ var signupValidation = [
             }
             return true;
         }),
-    check("full_name").isString().withMessage("Full name must be string").notEmpty().withMessage("Full name cannot be empty"),
+    check("fullName").isString().withMessage("Full name must be string").notEmpty().withMessage("Full name cannot be empty"),
     check("address").isString().withMessage("Address must be string").notEmpty().withMessage("Address cannot be empty"),
-    check("phone_number").isLength({ min: 10, max: 11 }).withMessage("Phone number must be 10-11 characters").notEmpty().withMessage("Phone number cannot be empty"),
+    check("phoneNumber").isLength({ min: 10, max: 11 }).withMessage("Phone number must be 10-11 characters").notEmpty().withMessage("Phone number cannot be empty"),
 ];
 
 var updateInfo = [
-    check("full_name").isString().withMessage("Full name must be string").notEmpty().withMessage("Full name cannot be empty"),
+    check("fullName").isString().withMessage("Full name must be string").notEmpty().withMessage("Full name cannot be empty"),
     check("address").isString().withMessage("Address must be string").notEmpty().withMessage("Address cannot be empty"),
-    check("phone_number").isLength({ min: 10, max: 11 }).withMessage("Phone number must be 10-11 characters").notEmpty().withMessage("Phone number cannot be empty"),
+    check("phoneNumber").isLength({ min: 10, max: 11 }).withMessage("Phone number must be 10-11 characters").notEmpty().withMessage("Phone number cannot be empty"),
     check("birthday").isString().withMessage("Birthday must be string").notEmpty().withMessage("Birthday cannot be empty"),
     check("email").isEmail().withMessage("Email must be valid").notEmpty().withMessage("Email cannot be empty"),
 ];
 
 var changePassword = [
-    check("old_password").isString().withMessage("Old password must be string").notEmpty().withMessage("Old password cannot be empty"),
-    check("new_password").isString().withMessage("New password must be string").notEmpty().withMessage("New password cannot be empty"),
-    check("confirm_password").custom((value, { req }) => {
-        if (value !== req.body.new_password) {
+    check("oldPassword").isString().withMessage("Old password must be string").notEmpty().withMessage("Old password cannot be empty"),
+    check("newPassword").isString().withMessage("New password must be string").notEmpty().withMessage("New password cannot be empty"),
+    check("confirmPassword").custom((value, { req }) => {
+        if (value !== req.body.newPassword) {
             throw new Error("Password and confirm password must be the same");
         }
         return true;
@@ -54,7 +54,7 @@ var changePassword = [
 var createNewHotel = [
     check("name").isString().withMessage("Name must be a string."),
     check("address").isString().withMessage("Address must be a string."),
-    check("phone_number")
+    check("phoneNumber")
         .isString()
         .withMessage("Phone number must be a string.")
         .isLength({
@@ -65,7 +65,7 @@ var createNewHotel = [
 ];
 
 var roomValidation = [
-    check("hotel_id").isNumeric().withMessage("Hotel_id must be a number"),
+    check("hotelId").isNumeric().withMessage("Hotel_id must be a number"),
     check("name").isString().withMessage("Name must be a string"),
     check("price").isNumeric().withMessage("Price must be a number"),
     check("type")

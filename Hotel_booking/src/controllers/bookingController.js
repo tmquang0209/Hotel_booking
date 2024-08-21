@@ -61,11 +61,11 @@ export async function createBooking(req, res) {
         const days = invoiceDetails.days;
 
         // create invoice
-        await BookingService.createInvoice(user, booking.id, totalPrice, paymentMethod);
+        await BookingService.createInvoice(booking.id, totalPrice, paymentMethod);
 
         const data = await BookingService.getBookingDetails(booking.id, user);
 
-        return res.json(apiResponse(1004, "Booking created successfully", { ...data, room_price: totalRoomPrice, service_price: totalServicePrice, total_price: totalPrice }));
+        return res.json(apiResponse(1004, "Booking created successfully", { ...data, roomPrice: totalRoomPrice, servicePrice: totalServicePrice, totalPrice: totalPrice }));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -141,19 +141,10 @@ export async function updateStatus(req, res) {
     const { status } = req.body;
     const user = req.user;
     try {
-        await BookingService.getBookingDetails(id, user);
-
-        if (["cancelled", "finished"].includes(status.toLowerCase())) {
-            // get all room in booking
-            const rooms = await BookingRooms.query().where("booking_id", id);
-            for (const room of rooms) {
-                // update room status
-                await Rooms.query().patchAndFetchById(room.room_id, {
-                    is_booked: false,
-                });
-            }
+        const details = await BookingService.getBookingDetails(id, user);
+        if (["CANCELLED", "FINISHED"].includes(details.status)) {
+            throw new ApiException(1010, "Booking already cancelled or finished");
         }
-
         await BookingService.updateStatus(id, status);
 
         const data = await BookingService.getBookingDetails(id, user);
@@ -172,15 +163,16 @@ export async function updatePayment(req, res) {
         // check booking status
         const booking = await Booking.query().findById(id);
 
-        if (["cancelled", "finished"].includes(booking.status.toLowerCase())) {
+        if (["CANCELLED", "FINISHED"].includes(booking.status)) {
             throw new ApiException(1010, "Booking already cancelled or finished");
         }
+
         const invoice = await Invoices.query().findOne({
             booking_id: id,
         });
 
         if (!invoice) {
-            throw new ApiException(1010, "Invoice not found");
+            throw new ApiException(1012, "Invoice not found");
         }
 
         if (payment_method) {

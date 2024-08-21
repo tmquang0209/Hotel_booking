@@ -2,7 +2,7 @@ import ApiException from "../utils/apiException.js";
 import Exception from "../utils/exception.js";
 import { verifyToken } from "../utils/jwt.js";
 
-const whitelist = ["login", "signup", "refresh-token"];
+const whitelist = ["login", "signup"];
 
 const authentication = async (req, res, next) => {
     const url = req.originalUrl;

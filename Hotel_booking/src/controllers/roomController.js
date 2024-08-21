@@ -4,15 +4,15 @@ import HotelService from "../services/hotelService.js";
 import RoomService from "../services/roomService.js";
 
 export async function createRoom(req, res) {
-    const { hotel_id, name, price, description, type, occupancy, status } = req.body;
+    const { hotelId, name, price, description, type, occupancy, status } = req.body;
     const user = req.user;
     try {
-        await HotelService.checkExists(hotel_id, user.id);
+        await HotelService.checkExists(hotelId, user.id);
 
-        await RoomService.checkExists(hotel_id, name);
+        await RoomService.checkExists(hotelId, name);
 
         const data = {
-            hotel_id,
+            hotel_id: hotelId,
             name,
             price,
             description: description,
@@ -43,9 +43,9 @@ export async function getDetails(req, res) {
 
 export async function getByHouse(req, res) {
     const { id } = req.query;
-    const user = req.user;
+
     try {
-        const roomsData = await RoomService.getByHotel(id);
+        const roomsData = (await RoomService.getByHotel(id)) || null;
 
         return res.json(apiResponse(1006, "Get all rooms in hotel successful.", roomsData));
     } catch (error) {

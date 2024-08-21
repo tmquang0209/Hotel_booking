@@ -3,13 +3,13 @@ import { apiResponse } from "../utils/apiResponse.js";
 import Exception from "../utils/exception.js";
 
 export async function createHotel(req, res) {
-    const { name, address, phone_number, email, status, services } = req.body;
+    const { name, address, phoneNumber, email, status, services } = req.body;
     const user = req.user;
     try {
         const hotelData = {
             name: name,
             address: address,
-            phone_number: phone_number,
+            phone_number: phoneNumber,
             email: email,
             status: status,
             owner_id: user.id,
@@ -48,7 +48,7 @@ export async function getAllHotelByUser(req, res) {
 
 export async function updateHotelInfo(req, res) {
     const { id } = req.query;
-    const { name, address, phone_number, email, status, services } = req.body;
+    const { name, address, phoneNumber, email, status, services } = req.body;
     const user = req.user;
     try {
         await HotelService.checkExists(id, user.id);
@@ -56,7 +56,7 @@ export async function updateHotelInfo(req, res) {
         const data = {
             name: name,
             address: address,
-            phone_number: phone_number,
+            phone_number: phoneNumber,
             email: email,
             status: status,
         };

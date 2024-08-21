@@ -42,8 +42,9 @@ class RoomService {
         return details;
     }
 
-    static async getByHotel(hotelId) {
-        const rooms = await Hotels.query().withGraphJoined("rooms").findById(hotelId);
+    static async getByHotel(hotelId, userId = null) {
+        const filter = userId ? { "hotels.id": hotelId, "hotels.owner_id": userId } : { "hotels.id": hotelId };
+        const rooms = await Hotels.query().withGraphJoined("rooms").findOne(filter);
 
         return rooms;
     }
@@ -87,10 +88,6 @@ class RoomService {
         if (isAvailable.count === 0 || isAvailable.count < qty) {
             throw new ApiException(1002, "Hotel is fully booked");
         }
-    }
-
-    static async getAvailableRooms(hotelId, type, qty) {
-        
     }
 }
 

@@ -65,10 +65,9 @@ class BookingService {
         return { totalServicePrice };
     }
 
-    static async createInvoice(user, bookingId, total, paymentMethod) {
+    static async createInvoice(bookingId, total, paymentMethod) {
         const invoice = await Invoices.query().insert({
             booking_id: bookingId,
-            guest_id: user.id,
             payment_method: paymentMethod,
             total: total,
             status: "PENDING",
@@ -136,16 +135,27 @@ class BookingService {
     }
 
     static async updateStatus(bookingId, status) {
+        // check status
+        
         await Booking.query().patchAndFetchById(bookingId, {
             status,
         });
 
-        if (["cancelled", "finished"].includes(status.toLowerCase())) {
+        // update invoice status
+        const invoice = await Invoices.query().findOne({
+            booking_id: bookingId,
+        });
+
+        await invoice.$query().patchAndFetch({
+            status: "REFUNDED",
+        });
+
+        if (["CANCELLED", "FINISHED"].includes(status)) {
             // get all room in booking
             const rooms = await BookingRooms.query().where("booking_id", bookingId);
             for (const room of rooms) {
                 // update room status
-                await Rooms.query().patchAndFetchById(room.room_id, {
+                await Rooms.query().patchAndFetchById(room.roomId, {
                     is_booked: false,
                 });
             }
