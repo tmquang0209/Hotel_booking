@@ -51,7 +51,7 @@ class BookingService {
         for (const service of services) {
             const serviceDetails = await HotelServiceModel.query().findOne({
                 hotel_id: hotelId,
-                service_id: service.id,
+                service_id: service.id
             });
 
             totalServicePrice += serviceDetails.price * service.quantity;
@@ -114,7 +114,7 @@ class BookingService {
             const rooms = await BookingRooms.query().where("booking_id", bookingId);
             for (const room of rooms) {
                 // update room status
-                await Rooms.query().patchAndFetchById(room.room_id, {
+                await Rooms.query().patchAndFetchById(room.roomId, {
                     is_booked: false,
                 });
             }
@@ -136,7 +136,7 @@ class BookingService {
 
     static async updateStatus(bookingId, status) {
         // check status
-        
+
         await Booking.query().patchAndFetchById(bookingId, {
             status,
         });

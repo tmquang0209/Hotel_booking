@@ -121,7 +121,7 @@ describe("POST /booking/create", () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotelId: 2,
+                hotelId: 1,
                 arrivalDate: "2024-04-28 18:00:00", //
                 departureDate: "2024-04-29 15:00:00",
                 numAdults: 2,
@@ -150,7 +150,7 @@ describe("POST /booking/create", () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotelId: 10,
+                hotelId: 2,
                 arrivalDate: "2024-04-28 18:00:00", //
                 departureDate: "2024-04-29 15:00:00",
                 numAdults: 2,
@@ -179,7 +179,7 @@ describe("POST /booking/create", () => {
         const response = await request(app)
             .post("/booking/create")
             .send({
-                hotelId: 10,
+                hotelId: 2,
                 arrivalDate: "2024-04-28 18:00:00", //
                 departureDate: "2024-04-29 15:00:00",
                 numAdults: 2,
@@ -335,9 +335,9 @@ describe("PUT /booking/update", () => {
     it("Update booking successfully", async () => {
         const response = await request(app)
             .put("/booking/update")
-            .query({ id: 1 })
+            .query({ id: 2 })
             .send({
-                hotelId: 10,
+                hotelId: 1,
                 arrivalDate: "2024-04-28 18:00:00", //
                 departureDate: "2024-04-29 15:00:00",
                 numAdults: 3,
@@ -381,14 +381,14 @@ describe("PUT /booking/update-status", () => {
 
     it("Update status successfully", async () => {
         const response = await request(app)
-            .put("/booking/update-status")
-            .query({
-                id: 1,
-            })
-            .send({
-                status: "CANCELLED",
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
+        .put("/booking/update-status")
+        .query({
+            id: 2,
+        })
+        .send({
+            status: "STAYING",
+        })
+        .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
         expect(response.body.code).toBe(1009);

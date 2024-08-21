@@ -37,7 +37,7 @@ describe("POST /room/create", () => {
         const response = await request(app)
             .post("/room/create")
             .send({
-                hotel_id: 10,
+                hotelId: 10,
                 name: Math.ceil(Math.random() * 1000),
                 price: 100000,
                 type: "VIP",
@@ -52,7 +52,7 @@ describe("POST /room/create", () => {
         const response = await request(app)
             .post("/room/create")
             .send({
-                hotel_id: 10,
+                hotelId: 10,
                 name: "Room " + Math.ceil(Math.random() * 1000),
                 price: 100000,
                 type: "VIP",
@@ -67,7 +67,7 @@ describe("POST /room/create", () => {
         const response = await request(app)
             .post("/room/create")
             .send({
-                hotel_id: 10,
+                hotelId: 1,
                 name: "A101",
                 price: 100000,
                 type: "VIP",
@@ -83,7 +83,7 @@ describe("POST /room/create", () => {
         const response = await request(app)
             .post("/room/create")
             .send({
-                hotel_id: 10,
+                hotelId: 1,
                 name: "A_" + Math.ceil(Math.random() * 1000),
                 price: 100000,
                 type: "VIP",
@@ -113,7 +113,7 @@ describe("GET /room/details", () => {
         const response = await request(app)
             .get("/room/details")
             .query({
-                id: 1,
+                id: -1,
             })
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
@@ -125,7 +125,7 @@ describe("GET /room/details", () => {
         const response = await request(app)
             .get("/room/details")
             .query({
-                id: roomId,
+                id: 2,
             })
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
@@ -139,7 +139,7 @@ describe("GET /room/list-by-house", () => {
         const response = await request(app)
             .get("/room/list-by-house")
             .query({
-                id: 10,
+                id: 1,
             })
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
@@ -156,7 +156,7 @@ describe("PUT /room/update", () => {
                 id: 2,
             })
             .send({
-                hotel_id: 2,
+                hotelId: 2,
                 name: "A101",
                 price: 200000,
                 type: "VIP",
@@ -174,7 +174,7 @@ describe("PUT /room/update", () => {
                 id: 1,
             })
             .send({
-                hotel_id: 2,
+                hotelId: 2,
                 name: "A101",
                 price: 200000,
                 type: "VIP",
@@ -193,7 +193,7 @@ describe("PUT /room/update", () => {
                 id: roomId,
             })
             .send({
-                hotel_id: 2,
+                hotelId: 1,
                 name: "A" + Math.ceil(Math.random() * 1000),
                 price: 200000,
                 type: "VIP",

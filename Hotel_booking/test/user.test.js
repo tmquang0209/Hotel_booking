@@ -51,9 +51,9 @@ describe("POST /info", () => {
 describe("PUT /user/update", () => {
     it("Should return data of user", async () => {
         const response = await request(app).put("/user/update").set("Authorization", `Bearer ${accessTokenOfOwner}`).send({
-            full_name: "Tran Minh Quang",
+            fullName: "Tran Minh Quang",
             email: "tmquang0209@gmail.com",
-            phone_number: "0397847805",
+            phoneNumber: "0397847805",
             birthday: "2003-02-09",
             address: "Vinh Phuc",
         });
@@ -64,9 +64,9 @@ describe("PUT /user/update", () => {
 
     it("validation error", async () => {
         const response = await request(app).put("/user/update").set("Authorization", `Bearer ${accessTokenOfOwner}`).send({
-            full_name: 123,
+            fullName: 123,
             email: "tmquang0209@gmail.com",
-            phone_number: "0397847805",
+            phoneNumber: "0397847805",
             birthday: "2003-02-09",
             address: "Vinh Phuc",
         });
@@ -79,8 +79,8 @@ describe("PUT /user/update", () => {
 describe("PUT /user/change-password", () => {
     it("Validation error", async () => {
         const response = await request(app).put("/user/change-password").set("Authorization", `Bearer ${accessTokenOfOwner}`).send({
-            old_password: "123456",
-            new_password: "1234567",
+            oldPassword: "123456",
+            newPassword: "1234567",
             confirm_password: "12345678",
         });
 
@@ -90,9 +90,9 @@ describe("PUT /user/change-password", () => {
 
     it("Old password is incorrect", async () => {
         const response = await request(app).put("/user/change-password").set("Authorization", `Bearer ${accessTokenOfOwner}`).send({
-            old_password: "1234567",
-            new_password: "12345678",
-            confirm_password: "12345678",
+            oldPassword: "1234567",
+            newPassword: "12345678",
+            confirmPassword: "12345678",
         });
 
         expect(response.status).toBe(400);
@@ -101,9 +101,9 @@ describe("PUT /user/change-password", () => {
 
     it("Password is not match", async () => {
         const response = await request(app).put("/user/change-password").set("Authorization", `Bearer ${accessTokenOfOwner}`).send({
-            old_password: "123456",
-            new_password: "12345678",
-            confirm_password: "1234567",
+            oldPassword: "123456",
+            newPassword: "12345678",
+            confirmPassword: "1234567",
         });
 
         expect(response.status).toBe(400);
@@ -118,9 +118,9 @@ describe("PUT /user/change-password", () => {
         });
         const accessToken = loginResponse.body.data?.accessToken;
         const response = await request(app).put("/user/change-password").set("Authorization", `Bearer ${accessToken}`).send({
-            old_password: "123456",
-            new_password: "123456",
-            confirm_password: "123456",
+            oldPassword: "123456",
+            newPassword: "123456",
+            confirmPassword: "123456",
         });
 
         expect(response.status).toBe(200);

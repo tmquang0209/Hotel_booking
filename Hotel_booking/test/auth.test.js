@@ -57,11 +57,11 @@ describe("Auth API", () => {
                     .send({
                         username: "unit_" + Math.ceil(Math.random() * 10000),
                         password: "123456",
-                        confirm_password: "123456",
+                        confirmPassword: "123456",
                         email: "unitTest@gmail.com",
-                        full_name: "Tran Minh Quang",
+                        fullName: "Tran Minh Quang",
                         address: "Vinh Phuc",
-                        phone_number: "0397847805",
+                        phoneNumber: "0397847805",
                         type: "OWNER",
                     });
 
@@ -75,11 +75,11 @@ describe("Auth API", () => {
                     .send({
                         username: "unit_" + Math.ceil(Math.random() * 10000),
                         password: "123456",
-                        confirm_password: "123456",
+                        confirmPassword: "123456",
                         email: "user@gmail.com",
-                        full_name: "Tran Minh Quang",
+                        fullName: "Tran Minh Quang",
                         address: "Vinh Phuc",
-                        phone_number: "0397847805",
+                        phoneNumber: "0397847805",
                         type: "GUEST",
                     });
 
@@ -93,11 +93,11 @@ describe("Auth API", () => {
                 const response = await request(app).post("/auth/signup").send({
                     username: "test_unit",
                     password: "123456",
-                    confirm_password: "123456",
+                    confirmPassword: "123456",
                     email: "tmquang0209@gmail.com",
-                    full_name: "Tran Minh Quang",
+                    fullName: "Tran Minh Quang",
                     address: "Vinh Phuc",
-                    phone_number: "0397847805",
+                    phoneNumber: "0397847805",
                     type: "OWNaER",
                 });
 
@@ -110,11 +110,11 @@ describe("Auth API", () => {
                 const response = await request(app).post("/auth/signup").send({
                     username: "tmquang2",
                     password: "123456",
-                    confirm_password: "123456",
+                    confirmPassword: "123456",
                     email: "tmquang0209@gmail.com",
-                    full_name: "Tran Minh Quang",
+                    fullName: "Tran Minh Quang",
                     address: "Vinh Phuc",
-                    phone_number: "0397847805",
+                    phoneNumber: "0397847805",
                     type: "OWNER",
                 });
 

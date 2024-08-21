@@ -35,7 +35,7 @@ class RoomService {
 
         if (!details) {
             throw new ApiException(1003, "The room is not found.", null);
-        } else if (details.hotel.owner_id !== userId) {
+        } else if (details.hotel.ownerId !== userId) {
             throw new ApiException(1007, "Access denied.", null);
         }
 
@@ -52,10 +52,9 @@ class RoomService {
     static async updateDetails(roomId, data) {
         // get room details
         const room = await Rooms.query().findById(roomId);
-
         if (data.name !== room.name) {
             const isExists = await Rooms.query().findOne({
-                hotel_id: room.hotel_id,
+                hotel_id: room.hotelId,
                 name: data.name,
             });
 

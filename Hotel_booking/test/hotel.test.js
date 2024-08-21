@@ -77,7 +77,7 @@ describe("POST /hotel/create", () => {
             .send({
                 name: "Hotel " + Math.ceil(Math.random() * 1000),
                 address: "Ha Noi",
-                phone_number: "0975385643",
+                phoneNumber: "0975385643",
                 email: `hotel_${Math.ceil(Math.random() * 1000)}@gmail.com`,
                 services: [
                     {
@@ -114,12 +114,11 @@ describe("GET /hotel/details", () => {
         const response = await request(app)
         .get("/hotel/details")
         .query({
-            id: 1,
+            id: -1,
         })
         .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
-        // expect(response.status).toBe(400);
-        // console.log("🚀 ~ it ~ response:", response)
+        expect(response.status).toBe(400);
         expect(response.body.code).toBe(1003);
     });
 
@@ -194,7 +193,7 @@ describe("PUT /hotel/update", () => {
         .send({
             name: "Hotel " + Math.ceil(Math.random() * 1000),
             address: "Ha Noi",
-            phone_number: "0975385643",
+            phoneNumber: "0975385643",
             email: `hotel_${Math.ceil(Math.random() * 1000)}@gmail.com`,
             services: [
                 {
@@ -221,10 +220,9 @@ describe("DELETE /hotel/delete", () => {
     });
 
     it("Hotel not found", async () => {
-        const response = await request(app).delete("/hotel/delete").query({ id: 1 }).set("Authorization", `Bearer ${accessTokenOfOwner}`);
+        const response = await request(app).delete("/hotel/delete").query({ id: -1 }).set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
-        console.log("🚀 ~ it ~ response:", response.body)
-        // expect(response.status).toBe(400);
+        expect(response.status).toBe(400);
         expect(response.body.code).toBe(1006);
     });
 

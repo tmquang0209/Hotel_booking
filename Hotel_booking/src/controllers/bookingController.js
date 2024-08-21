@@ -101,7 +101,7 @@ export async function updateBooking(req, res) {
     const { hotelId, arrivalDate, departureDate, numAdults, numChildren, rooms, services } = req.body;
     const user = req.user;
     try {
-        await HotelService.checkExists(hotelId, user.id);
+        // await HotelService.checkExists(hotelId, user.id);
         await BookingService.getBookingDetails(bookingId, user);
 
         const dataUpdate = {

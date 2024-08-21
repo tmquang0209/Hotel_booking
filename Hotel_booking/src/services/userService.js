@@ -8,7 +8,7 @@ class UserService {
     static async validateUser(username, password = null) {
         const user = await Users.query().findOne({ username });
         if (!user) {
-            throw new ApiException(1002, "User not found", null);
+            throw new ApiException(1002, "Username is incorrect", null);
         }
 
         if (password && !(await comparePassword(password, user.password))) {
