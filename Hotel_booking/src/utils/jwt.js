@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import ApiException from "./apiException";
+import { errorsCode } from "../enums/errorsCode";
 
 const generateAccessToken = (data) => {
     return jwt.sign(data, process.env.JWT_SECRET, { expiresIn: "1h" });
@@ -13,13 +15,18 @@ const verifyToken = (token) => {
     try {
         return jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {
-        if (e.data?.expiredAt) throw new Error("Token expired");
-        else throw new Error("Invalid token");
+        if (e.data?.expiredAt) throw new ApiException(1011, errorsCode.FORBIDDEN);
+        else throw new ApiException(1010, errorsCode.FORBIDDEN);
     }
 };
 
 const verifyRefreshToken = (token) => {
-    return jwt.verify(token, process.env.JWT_REFRESH);
+    try {
+        return jwt.verify(token, process.env.JWT_REFRESH);
+    } catch (e) {
+        if (e.data?.expiredAt) throw new ApiException(1006, errorsCode.UNAUTHORIZED);
+        else throw new ApiException(1008, errorsCode.UNAUTHORIZED);
+    }
 };
 
 export { generateAccessToken, generateRefreshToken, verifyToken, verifyRefreshToken };

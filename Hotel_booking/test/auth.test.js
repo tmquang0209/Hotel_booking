@@ -1,5 +1,6 @@
 import request from "supertest";
 import app from "../index.js";
+import { errorsCode } from "../src/enums/errorsCode.js";
 
 let accessToken = "";
 let refreshToken = "";
@@ -27,14 +28,15 @@ describe("Auth API", () => {
         });
 
         describe("Failure", () => {
-            it("Username or password is incorrect", async () => {
+            it("Username is incorrect", async () => {
                 const response = await request(app).post("/auth/login").send({
                     username: "tmquang2222",
                     password: "123456",
                 });
-
+                
                 expect(response.status).toBe(400);
-                expect(response.body.message).toBe("Username is incorrect");
+                expect(response.body.success).toBe(false);
+                expect(response.body.message).toBe("Username or password is incorrect");
             });
 
             it("Password is incorrect", async () => {
@@ -44,7 +46,8 @@ describe("Auth API", () => {
                 });
 
                 expect(response.status).toBe(400);
-                expect(response.body.message).toBe("Password is incorrect");
+                expect(response.body.success).toBe(false);
+                expect(response.body.message).toBe("Username or password is incorrect");
             });
         });
     });
@@ -66,25 +69,8 @@ describe("Auth API", () => {
                     });
 
                 expect(response.status).toBe(200);
-                expect(response.body.data).toHaveProperty("username");
-            });
-
-            it("Should return data of new user", async () => {
-                const response = await request(app)
-                    .post("/auth/signup")
-                    .send({
-                        username: "unit_" + Math.ceil(Math.random() * 10000),
-                        password: "123456",
-                        confirmPassword: "123456",
-                        email: "user@gmail.com",
-                        fullName: "Tran Minh Quang",
-                        address: "Vinh Phuc",
-                        phoneNumber: "0397847805",
-                        type: "GUEST",
-                    });
-
-                expect(response.status).toBe(200);
-                expect(response.body.data).toHaveProperty("username");
+                expect(response.body.success).toBe(true);
+                expect(response.body.message).toBe("Signup successfully");
             });
         });
 
@@ -101,9 +87,9 @@ describe("Auth API", () => {
                     type: "OWNaER",
                 });
 
-                expect(response.status).toBe(400);
-                expect(response.body.code).toBe(400);
-                expect(response.body.message).toBe("Validation Error");
+                expect(response.status).toBe(errorsCode.BAD_REQUEST);
+                expect(response.body.success).toBe(false);
+                expect(response.body.message).toBe("Validation error");
             });
 
             it("Username already exists", async () => {
@@ -119,7 +105,8 @@ describe("Auth API", () => {
                 });
 
                 expect(response.status).toBe(400);
-                expect(response.body.code).toBe(1003);
+                expect(response.body.success).toBe(false);
+                expect(response.body.message).toBe("User already exists");
             });
         });
     });
@@ -127,28 +114,14 @@ describe("Auth API", () => {
     describe("POST /refresh-token", () => {
         it("Should return new access token", async () => {
             const response = await request(app)
-            .post("/auth/refresh-token")
-            .set("Cookie", "refreshToken=" + refreshToken)
-            .set("Authorization", "Bearer " + accessToken);
+                .post("/auth/refresh-token")
+                .set("Cookie", "refreshToken=" + refreshToken)
+                .set("Authorization", "Bearer " + accessToken);
 
             expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe("Refresh token successfully");
             expect(response.body.data).toHaveProperty("accessToken");
-        });
-
-        it("Invalid token", async () => {
-            const response = await request(app)
-                .post("/auth/refresh-token")
-                .set("Cookie", "refreshToken=invalid_token")
-                .set("Authorization", "Bearer " + accessToken);
-        });
-
-        it("Refresh token is required", async () => {
-            const response = await request(app)
-                .post("/auth/refresh-token")
-                .set("Authorization", "Bearer " + accessToken);
-
-            expect(response.status).toBe(400);
-            expect(response.body.code).toBe(1005);
         });
 
         it("Invalid refresh token", async () => {
@@ -157,8 +130,19 @@ describe("Auth API", () => {
                 .set("Cookie", "refreshToken=invalid_token")
                 .set("Authorization", "Bearer " + accessToken);
 
-            expect(response.status).toBe(400);
-            expect(response.body.code).toBe(1008);
+            expect(response.status).toBe(errorsCode.UNAUTHORIZED);
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toBe("Invalid refresh token");
+        });
+
+        it("Refresh token is required", async () => {
+            const response = await request(app)
+                .post("/auth/refresh-token")
+                .set("Authorization", "Bearer " + accessToken);
+
+            expect(response.status).toBe(errorsCode.UNAUTHORIZED);
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toBe("Refresh token is required");
         });
     });
 
@@ -170,7 +154,8 @@ describe("Auth API", () => {
                 .set("Authorization", "Bearer " + accessToken);
 
             expect(response.status).toBe(200);
-            expect(response.body.code).toBe(1010);
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe("Logout successfully");
         });
 
         it("Invalid refresh token", async () => {
@@ -179,8 +164,9 @@ describe("Auth API", () => {
                 .set("Cookie", "refreshToken=" + "invalid_token")
                 .set("Authorization", "Bearer " + accessToken);
 
-            expect(response.status).toBe(400);
-            expect(response.body.code).toBe(1009);
+            expect(response.status).toBe(errorsCode.UNAUTHORIZED);
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toBe("Refresh token is invalid");
         });
 
         it("Invalid access token", async () => {
@@ -189,8 +175,9 @@ describe("Auth API", () => {
                 .set("Cookie", "refreshToken=" + refreshToken)
                 .set("Authorization", "Bearer " + "invalid_token");
 
-            expect(response.status).toBe(500);
-            expect(response.body.code).toBe(500);
+            expect(response.status).toBe(errorsCode.FORBIDDEN);
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toBe("Access token is invalid");
         });
     });
 });
@@ -199,14 +186,15 @@ describe("404", () => {
     it("Should return 404", async () => {
         const response = await request(app).get("/test").set("Authorization", `Bearer ${accessToken}`);
 
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(errorsCode.NOT_FOUND);
     });
 });
 
 describe("Authentication is required", () => {
-    it("Should return code 1000", async () => {
+    it('Should return message "Authentication header is required"', async () => {
         const response = await request(app).get("/user/info");
-        expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1000);
+        expect(response.status).toBe(errorsCode.FORBIDDEN);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Authentication header is required");
     });
 });

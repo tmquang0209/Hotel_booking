@@ -1,3 +1,4 @@
+import { errorsCode } from "../enums/errorsCode.js";
 import UserService from "../services/userService.js";
 import ApiException from "../utils/apiException.js";
 import { apiResponse } from "../utils/apiResponse.js";
@@ -48,7 +49,7 @@ async function refreshTokenController(req, res) {
         const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
-            throw new ApiException(1004);
+            throw new ApiException(1004, errorsCode.UNAUTHORIZED);
         }
 
         const { payload, newRefreshToken } = await UserService.verifyAndRefreshToken(refreshToken);

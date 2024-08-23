@@ -147,7 +147,7 @@ export async function updateStatus(req, res) {
 
         const data = await BookingService.getBookingDetails(id, user);
 
-        return res.json(apiResponse(1038, true, data));
+        return res.json(apiResponse(1039, true, data));
     } catch (error) {
         Exception.handle(error, req, res);
     }

@@ -1,6 +1,7 @@
 import { check } from "express-validator";
 import userType from "../enums/userType.js";
 import RoomType from "../models/roomType.js";
+import ApiException from "../utils/apiException.js";
 
 var loginValidation = [
     check("username").notEmpty().withMessage("Username cannot be empty").isString().withMessage("Username must be string"),
@@ -12,7 +13,7 @@ var signupValidation = [
     check("password").isString().withMessage("Password must be string").notEmpty().withMessage("Password cannot be empty"),
     check("confirmPassword").custom((value, { req }) => {
         if (value !== req.body.password) {
-            throw new Error("Password and confirm password must be the same");
+            throw new ApiException(1019);
         }
         return true;
     }),

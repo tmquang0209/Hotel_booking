@@ -56,8 +56,9 @@ describe("POST /booking/create", () => {
             })
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
-        expect(response.status).toBe(400);
-        expect(response.body.code).toBe(403);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Validate error", async () => {
@@ -86,6 +87,8 @@ describe("POST /booking/create", () => {
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
         expect(response.status).toBe(400);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Validation error");
     });
 
     it("Hotel not found", async () => {
@@ -114,7 +117,8 @@ describe("POST /booking/create", () => {
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1006);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Hotel not found");
     });
 
     it("Full room", async () => {
@@ -143,7 +147,8 @@ describe("POST /booking/create", () => {
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1002);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Hotel is fully booked");
     });
 
     it("Service not found", async () => {
@@ -172,7 +177,8 @@ describe("POST /booking/create", () => {
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1003);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Service not available");
     });
 
     it("Create booking successfully", async () => {
@@ -201,7 +207,8 @@ describe("POST /booking/create", () => {
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1004);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Booking created successfully");
     });
 });
 
@@ -215,7 +222,8 @@ describe("GET /booking/details", () => {
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1005);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Booking not found");
     });
 
     it("Should return data of booking", async () => {
@@ -227,7 +235,8 @@ describe("GET /booking/details", () => {
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1006);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Get booking details successfully");
     });
 });
 
@@ -236,7 +245,8 @@ describe("GET /booking/list", () => {
         const response = await request(app).get("/booking/list").set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1007);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Get booking list successfully");
     });
 });
 
@@ -267,8 +277,9 @@ describe("PUT /booking/update", () => {
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
-        expect(response.body.code).toBe(403);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Validate error", async () => {
@@ -298,6 +309,8 @@ describe("PUT /booking/update", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Validation error");
     });
 
     it("Booking not found", async () => {
@@ -329,7 +342,8 @@ describe("PUT /booking/update", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1005);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Booking not found");
     });
 
     it("Update booking successfully", async () => {
@@ -359,7 +373,8 @@ describe("PUT /booking/update", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1008);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Booking updated successfully");
     });
 });
 
@@ -376,22 +391,24 @@ describe("PUT /booking/update-status", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1005);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Booking not found");
     });
 
     it("Update status successfully", async () => {
         const response = await request(app)
-        .put("/booking/update-status")
-        .query({
-            id: 2,
-        })
-        .send({
-            status: "STAYING",
-        })
-        .set("Authorization", `Bearer ${accessTokenOfOwner}`);
+            .put("/booking/update-status")
+            .query({
+                id: 2,
+            })
+            .send({
+                status: "STAYING",
+            })
+            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1009);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Booking status updated successfully");
     });
 });
 
@@ -408,7 +425,8 @@ describe("PUT /booking/update-payment", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1010);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Booking already cancelled or finished");
     });
 
     it("Update payment successfully", async () => {
@@ -423,6 +441,7 @@ describe("PUT /booking/update-payment", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1011);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Invoice updated successfully");
     });
 });

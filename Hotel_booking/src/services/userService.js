@@ -3,6 +3,7 @@ import ApiException from "../utils/apiException.js";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.js";
 import ManageAccess from "../models/manageAccess.js";
 import Users from "../models/users.js";
+import { errorsCode } from "../enums/errorsCode.js";
 
 class UserService {
     static async validateUser(username, password = null) {
@@ -60,7 +61,7 @@ class UserService {
         const storedToken = await ManageAccess.query().findOne({ refresh_token: refreshToken });
         const payload = verifyRefreshToken(refreshToken);
         if (!storedToken && !payload) {
-            throw new ApiException(1005);
+            throw new ApiException(1005, errorsCode.UNAUTHORIZED);
         }
 
         const currentTime = Math.floor(Date.now() / 1000);
@@ -83,7 +84,7 @@ class UserService {
 
     static async deleteToken(refreshToken) {
         const isValid = await ManageAccess.query().findOne({ refresh_token: refreshToken });
-        if (!isValid) throw new ApiException(1005);
+        if (!isValid) throw new ApiException(1005, errorsCode.UNAUTHORIZED);
 
         await ManageAccess.query().delete().where("refresh_token", refreshToken);
     }
@@ -101,7 +102,7 @@ class UserService {
 
     static async changePassword(user, { oldPassword, newPassword }) {
         if (!(await comparePassword(oldPassword, user.password))) {
-            throw new ApiException(1018);
+            throw new ApiException(1018, errorsCode.BAD_REQUEST);
         }
 
         const encryptPassword = await hashPassword(newPassword);

@@ -79,7 +79,7 @@ class BookingService {
     static async getBookingDetails(bookingId, user) {
         const checkExists = await Booking.query().findById(bookingId);
         if (!checkExists) {
-            throw new ApiException(1036, null);
+            throw new ApiException(1036);
         }
 
         if (user.type === "OWNER") {
@@ -99,7 +99,7 @@ class BookingService {
             });
             return details;
         }
-        throw new ApiException(1045, null);
+        throw new ApiException(1045);
     }
 
     static async getBookingList(user) {

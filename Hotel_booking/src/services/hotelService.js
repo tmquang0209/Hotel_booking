@@ -1,3 +1,4 @@
+import { errorsCode } from "../enums/errorsCode.js";
 import Hotels from "../models/hotels.js";
 import HotelServiceModel from "../models/hotelService.js";
 import ApiException from "../utils/apiException.js";
@@ -27,7 +28,7 @@ class HotelService {
         });
 
         if (!details) {
-            throw new ApiException(1021, null);
+            throw new ApiException(1021, errorsCode.BAD_REQUEST);
         }
 
         return details;
@@ -38,7 +39,7 @@ class HotelService {
         const details = await Hotels.query().findOne(filter);
 
         if (!details) {
-            throw new ApiException(1021, null);
+            throw new ApiException(1021, errorsCode.BAD_REQUEST);
         }
 
         return details !== null;

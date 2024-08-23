@@ -1,10 +1,9 @@
 import request from "supertest";
 import app from "../index.js";
+import { errorsCode } from "../src/enums/errorsCode.js";
 
 let accessTokenOfOwner = "";
-let refreshTokenOfOwner = "";
 let accessTokenOfGuest = "";
-let refreshTokenOfGuest = "";
 
 describe("POST /login", () => {
     it("Should return data of owner", async () => {
@@ -15,7 +14,7 @@ describe("POST /login", () => {
         });
 
         accessTokenOfOwner = response.body.data.accessToken;
-        refreshTokenOfOwner = response.body.data.refreshToken;
+        // refreshTokenOfOwner = response.body.data.refreshToken;
     });
 
     it("Should return data of guest", async () => {
@@ -26,7 +25,7 @@ describe("POST /login", () => {
         });
 
         accessTokenOfGuest = response.body.data.accessToken;
-        refreshTokenOfGuest = response.body.data.refreshToken;
+        // refreshTokenOfGuest = response.body.data.refreshToken;
     });
 });
 
@@ -36,6 +35,8 @@ describe("POST /info", () => {
             const response = await request(app).get("/user/info").set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
             expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe("Get user info successfully");
             expect(response.body.data).toHaveProperty("username");
         });
 
@@ -43,6 +44,8 @@ describe("POST /info", () => {
             const response = await request(app).get("/user/info").set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
             expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe("Get user info successfully");
             expect(response.body.data).toHaveProperty("username");
         });
     });
@@ -59,6 +62,8 @@ describe("PUT /user/update", () => {
         });
 
         expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("User updated successfully");
         expect(response.body.data).toHaveProperty("username");
     });
 
@@ -71,8 +76,9 @@ describe("PUT /user/update", () => {
             address: "Vinh Phuc",
         });
 
-        expect(response.status).toBe(400);
-        expect(response.body.message).toBe("Validation Error");
+        expect(response.status).toBe(errorsCode.BAD_REQUEST);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Validation error");
     });
 });
 
@@ -84,8 +90,9 @@ describe("PUT /user/change-password", () => {
             confirm_password: "12345678",
         });
 
-        expect(response.status).toBe(400);
-        expect(response.body.code).toBe(400);
+        expect(response.status).toBe(errorsCode.BAD_REQUEST);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Validation error");
     });
 
     it("Old password is incorrect", async () => {
@@ -96,7 +103,7 @@ describe("PUT /user/change-password", () => {
         });
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1003);
+        expect(response.body.message).toBe("Old password is incorrect");
     });
 
     it("Password is not match", async () => {
@@ -106,8 +113,10 @@ describe("PUT /user/change-password", () => {
             confirmPassword: "1234567",
         });
 
-        expect(response.status).toBe(400);
-        expect(response.body.code).toBe(400);
+        expect(response.status).toBe(errorsCode.BAD_REQUEST);
+        expect(response.body.success).toBe(false);
+        // check body has string "Password and confirm password must be the same"
+        expect(JSON.stringify(response.body.data)).toContain("Password and confirm password must be the same");
     });
 
     it("Change password successful", async () => {
@@ -124,6 +133,6 @@ describe("PUT /user/change-password", () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1002);
+        expect(response.body.message).toBe("Change password successfully");
     });
 });

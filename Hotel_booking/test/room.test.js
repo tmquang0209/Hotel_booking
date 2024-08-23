@@ -46,6 +46,8 @@ describe("POST /room/create", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Validation error");
     });
 
     it("Access is denied to guests", async () => {
@@ -60,7 +62,9 @@ describe("POST /room/create", () => {
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Room names exist in this hotel", async () => {
@@ -76,7 +80,8 @@ describe("POST /room/create", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1002);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Room name already exists in this hotel");
     });
 
     it("Should create a new room", async () => {
@@ -93,7 +98,8 @@ describe("POST /room/create", () => {
 
         roomId = response.body.data.id;
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1001);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Create a new room successfully");
     });
 });
 
@@ -106,7 +112,9 @@ describe("GET /room/details", () => {
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Room is not found", async () => {
@@ -118,7 +126,8 @@ describe("GET /room/details", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1003);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Room not found");
     });
 
     it("Should return data of room", async () => {
@@ -130,7 +139,8 @@ describe("GET /room/details", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1004);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Get room details successfully");
     });
 });
 
@@ -144,7 +154,8 @@ describe("GET /room/list-by-house", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1006);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Get all rooms in hotel successfully");
     });
 });
 
@@ -164,7 +175,9 @@ describe("PUT /room/update", () => {
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Room is not found", async () => {
@@ -183,7 +196,8 @@ describe("PUT /room/update", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1008);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Access denied");
     });
 
     it("Should update details of room", async () => {
@@ -202,7 +216,8 @@ describe("PUT /room/update", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1009);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Room details updated successfully");
     });
 });
 
@@ -216,7 +231,8 @@ describe("DELETE /room/delete", () => {
             .set("Authorization", accessTokenOfOwner);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1008);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Access denied");
     });
 
     it("Delete room successful", async () => {
@@ -228,6 +244,7 @@ describe("DELETE /room/delete", () => {
             .set("Authorization", accessTokenOfOwner);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1010);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Room deleted successfully");
     });
 });

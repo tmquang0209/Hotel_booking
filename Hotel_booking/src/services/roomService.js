@@ -1,4 +1,5 @@
 import { deleteRoom } from "../controllers/roomController.js";
+import { errorsCode } from "../enums/errorsCode.js";
 import BookingRooms from "../models/bookingRooms.js";
 import Hotels from "../models/hotels.js";
 import Rooms from "../models/rooms.js";
@@ -12,7 +13,7 @@ class RoomService {
         });
 
         if (!room) {
-            throw new ApiException(1045, null);
+            throw new ApiException(1045, errorsCode.BAD_REQUEST);
         }
     }
 
@@ -22,7 +23,7 @@ class RoomService {
             name: roomName,
         });
 
-        if (isExists) throw new ApiException(1032, null);
+        if (isExists) throw new ApiException(1032, errorsCode.BAD_REQUEST);
     }
 
     static async create(data) {
@@ -34,9 +35,9 @@ class RoomService {
         const details = await Rooms.query().withGraphJoined("hotel").findById(roomId);
 
         if (!details) {
-            throw new ApiException(1031, null);
+            throw new ApiException(1031, errorsCode.BAD_REQUEST);
         } else if (details.hotel.ownerId !== userId) {
-            throw new ApiException(1045, null);
+            throw new ApiException(1045, errorsCode.BAD_REQUEST);
         }
 
         return details;
@@ -58,7 +59,7 @@ class RoomService {
                 name: data.name,
             });
 
-            if (isExists) throw new ApiException(1032, null);
+            if (isExists) throw new ApiException(1032, errorsCode.BAD_REQUEST);
         }
 
         // update room details

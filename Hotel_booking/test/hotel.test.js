@@ -53,7 +53,9 @@ describe("POST /hotel/create", () => {
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Validation error", async () => {
@@ -68,7 +70,8 @@ describe("POST /hotel/create", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(400);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Validation error");
     });
 
     it("Should return data of new hotel", async () => {
@@ -94,6 +97,7 @@ describe("POST /hotel/create", () => {
 
         hotelId = response.body.data.id;
         expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Create a new hotel successfully");
         expect(response.body.data).toHaveProperty("id");
     });
 });
@@ -107,19 +111,22 @@ describe("GET /hotel/details", () => {
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Hotel not found", async () => {
         const response = await request(app)
-        .get("/hotel/details")
-        .query({
-            id: -1,
-        })
-        .set("Authorization", `Bearer ${accessTokenOfOwner}`);
+            .get("/hotel/details")
+            .query({
+                id: -1,
+            })
+            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1003);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Hotel not found");
     });
 
     it("Should return data of hotel", async () => {
@@ -131,6 +138,8 @@ describe("GET /hotel/details", () => {
             .set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Get hotel details successfully");
         expect(response.body.data).toHaveProperty("id");
     });
 });
@@ -140,13 +149,17 @@ describe(`GET /hotel/all`, () => {
         const response = await request(app).get("/hotel/all").set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Get hotel list successfully");
         expect(response.body.data).toBeInstanceOf(Array);
     });
 
     it("Access is denied to guests", async () => {
         const response = await request(app).get("/hotel/all").set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 });
 
@@ -175,7 +188,9 @@ describe("PUT /hotel/update", () => {
             })
             .set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Hotel not found", async () => {
@@ -187,49 +202,54 @@ describe("PUT /hotel/update", () => {
 
     it("Should return data of updated hotel", async () => {
         const response = await request(app)
-        .put("/hotel/update")
-        .query({ id: hotelId })
-        .set("Authorization", `Bearer ${accessTokenOfOwner}`)
-        .send({
-            name: "Hotel " + Math.ceil(Math.random() * 1000),
-            address: "Ha Noi",
-            phoneNumber: "0975385643",
-            email: `hotel_${Math.ceil(Math.random() * 1000)}@gmail.com`,
-            services: [
-                {
-                    id: 1,
-                    price: 100000,
-                },
-                {
-                    id: 2,
-                    price: 200000,
-                },
-            ],
+            .put("/hotel/update")
+            .query({ id: hotelId })
+            .set("Authorization", `Bearer ${accessTokenOfOwner}`)
+            .send({
+                name: "Hotel " + Math.ceil(Math.random() * 1000),
+                address: "Ha Noi",
+                phoneNumber: "0975385643",
+                email: `hotel_${Math.ceil(Math.random() * 1000)}@gmail.com`,
+                services: [
+                    {
+                        id: 1,
+                        price: 100000,
+                    },
+                    {
+                        id: 2,
+                        price: 200000,
+                    },
+                ],
             });
 
-            expect(response.status).toBe(200);
-            expect(response.body.code).toBe(1005);
-        });
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Update hotel info successfully");
     });
+});
 
 describe("DELETE /hotel/delete", () => {
     it("Access is denied to guests", async () => {
         const response = await request(app).delete("/hotel/delete").query({ id: 10 }).set("Authorization", `Bearer ${accessTokenOfGuest}`);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("You are not authorized to access this resource");
     });
 
     it("Hotel not found", async () => {
         const response = await request(app).delete("/hotel/delete").query({ id: -1 }).set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(400);
-        expect(response.body.code).toBe(1006);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe("Hotel not found");
     });
 
     it("Should return success message", async () => {
         const response = await request(app).delete("/hotel/delete").query({ id: hotelId }).set("Authorization", `Bearer ${accessTokenOfOwner}`);
 
         expect(response.status).toBe(200);
-        expect(response.body.code).toBe(1007);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("Delete hotel successfully");
     });
 });
