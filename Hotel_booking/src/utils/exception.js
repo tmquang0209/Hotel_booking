@@ -1,9 +1,8 @@
 import { apiResponse } from "./apiResponse.js";
 import Logs from "../models/logs.js";
 class Exception {
-    constructor(code, message, data, httpCode) {
+    constructor(code, data, httpCode) {
         this.code = code;
-        this.message = message;
         this.data = data;
         this.httpCode = httpCode;
     }
@@ -30,7 +29,7 @@ class Exception {
 
         await Logs.query().insert(logData);
 
-        return response.status(this.httpCode).json(apiResponse(this.code, this.message, this.data));
+        return response.status(this.httpCode).json(apiResponse(this.code, false, this.data));
     }
 }
 

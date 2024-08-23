@@ -1,3 +1,4 @@
+import { errorsCode } from "../enums/errorsCode.js";
 import ApiException from "../utils/apiException.js";
 import Exception from "../utils/exception.js";
 import { verifyToken } from "../utils/jwt.js";
@@ -17,7 +18,7 @@ const authentication = async (req, res, next) => {
 
     try {
         if (!accessToken) {
-            throw new ApiException(1000, "Authentication header is required", null);
+            throw new ApiException(997, errorsCode.FORBIDDEN, null);
         }
         // Verify token
         const data = verifyToken(accessToken);

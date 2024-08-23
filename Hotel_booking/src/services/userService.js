@@ -8,11 +8,11 @@ class UserService {
     static async validateUser(username, password = null) {
         const user = await Users.query().findOne({ username });
         if (!user) {
-            throw new ApiException(1002, "Username is incorrect", null);
+            throw new ApiException(1001);
         }
 
         if (password && !(await comparePassword(password, user.password))) {
-            throw new ApiException(1001, "Password is incorrect", null);
+            throw new ApiException(1001);
         }
 
         return user;
@@ -21,7 +21,7 @@ class UserService {
     static async createUser(data) {
         const user = await Users.query().findOne({ username: data.username });
         if (user) {
-            throw new ApiException(1003, "Username already exists", null);
+            throw new ApiException(1014);
         }
 
         const encryptPassword = await hashPassword(data.password);
@@ -58,13 +58,9 @@ class UserService {
 
     static async verifyAndRefreshToken(refreshToken) {
         const storedToken = await ManageAccess.query().findOne({ refresh_token: refreshToken });
-        if (!storedToken) {
-            throw new ApiException(1008, "Refresh token is invalid.");
-        }
-
         const payload = verifyRefreshToken(refreshToken);
-        if (!payload) {
-            throw new ApiException(1008, "Invalid refresh token.");
+        if (!storedToken && !payload) {
+            throw new ApiException(1005);
         }
 
         const currentTime = Math.floor(Date.now() / 1000);
@@ -87,7 +83,7 @@ class UserService {
 
     static async deleteToken(refreshToken) {
         const isValid = await ManageAccess.query().findOne({ refresh_token: refreshToken });
-        if (!isValid) throw new ApiException(1009, "Refresh token is invalid.");
+        if (!isValid) throw new ApiException(1005);
 
         await ManageAccess.query().delete().where("refresh_token", refreshToken);
     }
@@ -105,7 +101,7 @@ class UserService {
 
     static async changePassword(user, { oldPassword, newPassword }) {
         if (!(await comparePassword(oldPassword, user.password))) {
-            throw new ApiException(1003, "Old password is incorrect");
+            throw new ApiException(1018);
         }
 
         const encryptPassword = await hashPassword(newPassword);

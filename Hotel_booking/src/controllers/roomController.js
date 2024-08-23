@@ -23,7 +23,7 @@ export async function createRoom(req, res) {
 
         const newRoomData = await RoomService.create(data);
 
-        return res.json(apiResponse(1001, "Create new room successful.", newRoomData));
+        return res.json(apiResponse(1027, true, newRoomData));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -35,7 +35,7 @@ export async function getDetails(req, res) {
     try {
         const details = await RoomService.getDetails(user.id, id);
 
-        return res.json(apiResponse(1004, "Get room details successful.", details));
+        return res.json(apiResponse(1028, true, details));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -47,7 +47,7 @@ export async function getByHouse(req, res) {
     try {
         const roomsData = (await RoomService.getByHotel(id)) || null;
 
-        return res.json(apiResponse(1006, "Get all rooms in hotel successful.", roomsData));
+        return res.json(apiResponse(1029, true, roomsData));
     } catch (error) {
         Exception.handle(error);
     }
@@ -73,7 +73,7 @@ export async function updateDetails(req, res) {
         // Update room details
         const update = await RoomService.updateDetails(id, data);
 
-        return res.json(apiResponse(1009, "Room details updated successfully.", update));
+        return res.json(apiResponse(1030, true, update));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -87,7 +87,7 @@ export async function deleteRoom(req, res) {
 
         const deleteData = await RoomService.deleteRoom(id);
 
-        return res.json(apiResponse(1010, "The room deleted successfully.", null));
+        return res.json(apiResponse(1033, true, null));
     } catch (error) {
         Exception.handle(error, req, res);
     }

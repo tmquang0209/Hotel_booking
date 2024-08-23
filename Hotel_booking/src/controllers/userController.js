@@ -7,7 +7,7 @@ export async function getUserInfo(req, res) {
     try {
         const userInfo = await UserService.getUserDetails(user);
 
-        return res.json(apiResponse(1002, "Get user info successfully", userInfo));
+        return res.json(apiResponse(1017, true, userInfo));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -27,7 +27,7 @@ export async function updateUserInfo(req, res) {
 
         const userInfo = await UserService.updateUserInfo(user, data);
 
-        return res.json(apiResponse(1002, "Update user info successfully", userInfo));
+        return res.json(apiResponse(1016, true, userInfo));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -46,7 +46,7 @@ export async function changePassword(req, res) {
 
         await UserService.changePassword(userDetails, data);
 
-        return res.json(apiResponse(1002, "Change password successfully"));
+        return res.json(apiResponse(1020, true));
     } catch (error) {
         Exception.handle(error, req, res);
     }

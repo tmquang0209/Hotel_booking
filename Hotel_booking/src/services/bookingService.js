@@ -51,7 +51,7 @@ class BookingService {
         for (const service of services) {
             const serviceDetails = await HotelServiceModel.query().findOne({
                 hotel_id: hotelId,
-                service_id: service.id
+                service_id: service.id,
             });
 
             totalServicePrice += serviceDetails.price * service.quantity;
@@ -79,7 +79,7 @@ class BookingService {
     static async getBookingDetails(bookingId, user) {
         const checkExists = await Booking.query().findById(bookingId);
         if (!checkExists) {
-            throw new ApiException(1005, "Booking with id " + bookingId + " isn't exists.", null);
+            throw new ApiException(1036, null);
         }
 
         if (user.type === "OWNER") {
@@ -99,7 +99,7 @@ class BookingService {
             });
             return details;
         }
-        throw new ApiException(1005, "Access denied.", null);
+        throw new ApiException(1045, null);
     }
 
     static async getBookingList(user) {

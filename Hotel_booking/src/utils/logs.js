@@ -1,6 +1,7 @@
+import { errorsCode } from "../enums/errorsCode.js";
 import Logs from "../models/logs.js";
 
-export const saveLog = async (req, res, next) => {
+export const notFoundPage = async (req, res, next) => {
     const user = req?.user;
 
     const data = {
@@ -9,10 +10,10 @@ export const saveLog = async (req, res, next) => {
         http_code: "404",
         path: req.path,
         data: req.body ? JSON.stringify(req.body) : null,
-        description: res.statusMessage,
+        description: "Page not found",
     };
 
     await Logs.query().insert(data);
 
-    return res.status(404).send("Page not found");
+    return res.status(errorsCode.NOT_FOUND).send("Page not found");
 };

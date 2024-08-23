@@ -17,7 +17,7 @@ export async function createHotel(req, res) {
 
         const newHotel = await HotelService.create(hotelData, services);
 
-        return res.json(apiResponse(1001, "Create a new hotel successful.", newHotel));
+        return res.json(apiResponse(1022, true, newHotel));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -29,7 +29,7 @@ export async function getDetails(req, res) {
     try {
         const details = await HotelService.getDetails(user.id, id);
 
-        return res.json(apiResponse(1002, "Get hotel details successful.", details));
+        return res.json(apiResponse(1023, true, details));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -40,7 +40,7 @@ export async function getAllHotelByUser(req, res) {
     try {
         const list = await HotelService.getHotelsByOwner(user.id);
 
-        return res.json(apiResponse(1004, "Get hotel list successful.", list));
+        return res.json(apiResponse(1024, true, list));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -63,7 +63,7 @@ export async function updateHotelInfo(req, res) {
 
         const update = await HotelService.updateInfo(data, services, id);
 
-        return res.json(apiResponse(1005, "Update hotel info successful.", update));
+        return res.json(apiResponse(1025, true, update));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -76,7 +76,7 @@ export async function deleteHotel(req, res) {
         await HotelService.checkExists(id, user.id);
 
         const deleteData = await HotelService.deleteHotel(id);
-        return res.json(apiResponse(1007, "Delete hotel successful.", deleteData));
+        return res.json(apiResponse(1026, true, deleteData));
     } catch (error) {
         Exception.handle(error, req, res);
     }

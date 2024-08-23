@@ -12,7 +12,7 @@ class RoomService {
         });
 
         if (!room) {
-            throw new ApiException(1008, "Room access denied or room not found.", null);
+            throw new ApiException(1045, null);
         }
     }
 
@@ -22,7 +22,7 @@ class RoomService {
             name: roomName,
         });
 
-        if (isExists) throw new ApiException(1002, "Room names exist in this hotel.", null);
+        if (isExists) throw new ApiException(1032, null);
     }
 
     static async create(data) {
@@ -34,9 +34,9 @@ class RoomService {
         const details = await Rooms.query().withGraphJoined("hotel").findById(roomId);
 
         if (!details) {
-            throw new ApiException(1003, "The room is not found.", null);
+            throw new ApiException(1031, null);
         } else if (details.hotel.ownerId !== userId) {
-            throw new ApiException(1007, "Access denied.", null);
+            throw new ApiException(1045, null);
         }
 
         return details;
@@ -58,7 +58,7 @@ class RoomService {
                 name: data.name,
             });
 
-            if (isExists) throw new ApiException(1002, "Room names exist in this hotel.", null);
+            if (isExists) throw new ApiException(1032, null);
         }
 
         // update room details
@@ -85,7 +85,7 @@ class RoomService {
             });
 
         if (isAvailable.count === 0 || isAvailable.count < qty) {
-            throw new ApiException(1002, "Hotel is fully booked");
+            throw new ApiException(1035);
         }
     }
 }

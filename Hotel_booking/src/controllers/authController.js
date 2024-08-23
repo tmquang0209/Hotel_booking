@@ -15,7 +15,7 @@ async function loginController(req, res) {
 
         await UserService.saveTokens(username, accessToken, refreshToken);
 
-        return res.json(apiResponse(1002, "Login successfully", { accessToken, refreshToken }));
+        return res.json(apiResponse(1002, true, { accessToken, refreshToken }));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -37,7 +37,7 @@ async function signupController(req, res) {
 
         const user = await UserService.createUser(data);
 
-        return res.json(apiResponse(1004, "Signup successfully", user));
+        return res.json(apiResponse(1015, true, user));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -48,7 +48,7 @@ async function refreshTokenController(req, res) {
         const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
-            throw new ApiException(1005, "Refresh token is required", null);
+            throw new ApiException(1004);
         }
 
         const { payload, newRefreshToken } = await UserService.verifyAndRefreshToken(refreshToken);
@@ -57,7 +57,7 @@ async function refreshTokenController(req, res) {
 
         const accessToken = UserService.generateTokens(user).accessToken;
 
-        return res.json(apiResponse(1007, "Refresh token successfully", { accessToken, refreshToken: newRefreshToken }));
+        return res.json(apiResponse(1007, true, { accessToken, refreshToken: newRefreshToken }));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -71,7 +71,7 @@ async function logoutController(req, res) {
 
         res.cookie("refreshToken", null);
 
-        return res.json(apiResponse(1010, "Logout successful"));
+        return res.json(apiResponse(1013, true));
     } catch (error) {
         Exception.handle(error, req, res);
     }

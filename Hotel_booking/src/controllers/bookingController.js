@@ -2,8 +2,6 @@ import Exception from "../utils/exception.js";
 import ApiException from "../utils/apiException.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import Booking from "../models/booking.js";
-import BookingRooms from "../models/bookingRooms.js";
-import Rooms from "../models/rooms.js";
 import Invoices from "../models/invoices.js";
 import HotelService from "../services/hotelService.js";
 import RoomService from "../services/roomService.js";
@@ -65,7 +63,7 @@ export async function createBooking(req, res) {
 
         const data = await BookingService.getBookingDetails(booking.id, user);
 
-        return res.json(apiResponse(1004, "Booking created successfully", { ...data, roomPrice: totalRoomPrice, servicePrice: totalServicePrice, totalPrice: totalPrice }));
+        return res.json(apiResponse(1037, true, { ...data, roomPrice: totalRoomPrice, servicePrice: totalServicePrice, totalPrice: totalPrice }));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -78,7 +76,7 @@ export async function getBookingDetails(req, res) {
     try {
         const data = await BookingService.getBookingDetails(id, user);
 
-        return res.json(apiResponse(1006, "Booking details", data));
+        return res.json(apiResponse(1043, true, data));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -88,7 +86,7 @@ export async function getBookingList(req, res) {
     const user = req.user;
     try {
         const data = await BookingService.getBookingList(user);
-        return res.json(apiResponse(1007, "Booking list", data));
+        return res.json(apiResponse(1044, true, data));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -130,7 +128,7 @@ export async function updateBooking(req, res) {
 
         const data = await BookingService.getBookingDetails(bookingId, user);
 
-        return res.json(apiResponse(1008, "Booking updated successfully", data));
+        return res.json(apiResponse(1038, true, data));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -143,13 +141,13 @@ export async function updateStatus(req, res) {
     try {
         const details = await BookingService.getBookingDetails(id, user);
         if (["CANCELLED", "FINISHED"].includes(details.status)) {
-            throw new ApiException(1010, "Booking already cancelled or finished");
+            throw new ApiException(1040);
         }
         await BookingService.updateStatus(id, status);
 
         const data = await BookingService.getBookingDetails(id, user);
 
-        return res.json(apiResponse(1009, "Booking status updated successfully", data));
+        return res.json(apiResponse(1038, true, data));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -164,7 +162,7 @@ export async function updatePayment(req, res) {
         const booking = await Booking.query().findById(id);
 
         if (["CANCELLED", "FINISHED"].includes(booking.status)) {
-            throw new ApiException(1010, "Booking already cancelled or finished");
+            throw new ApiException(1040);
         }
 
         const invoice = await Invoices.query().findOne({
@@ -172,7 +170,7 @@ export async function updatePayment(req, res) {
         });
 
         if (!invoice) {
-            throw new ApiException(1012, "Invoice not found");
+            throw new ApiException(1041);
         }
 
         if (payment_method) {
@@ -187,7 +185,7 @@ export async function updatePayment(req, res) {
             });
         }
 
-        return res.json(apiResponse(1011, "Invoice updated successfully", data));
+        return res.json(apiResponse(1042, true, data));
     } catch (error) {
         Exception.handle(error, req, res);
     }

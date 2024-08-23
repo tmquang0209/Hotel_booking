@@ -27,7 +27,7 @@ class HotelService {
         });
 
         if (!details) {
-            throw new ApiException(1003, "Hotel with id " + hotelId + " isn't exists.", null);
+            throw new ApiException(1021, null);
         }
 
         return details;
@@ -38,7 +38,7 @@ class HotelService {
         const details = await Hotels.query().findOne(filter);
 
         if (!details) {
-            throw new ApiException(1006, "Can not find this hotel.", null);
+            throw new ApiException(1021, null);
         }
 
         return details !== null;
@@ -80,7 +80,7 @@ class HotelService {
             .whereIn("service_id", [...services.map((service) => service.id)])
             .where("hotel_id", hotelId);
         if (availableServices.length !== services.length) {
-            throw new ApiException(1003, "Service not available");
+            throw new ApiException(1046);
         }
     }
 }

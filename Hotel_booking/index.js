@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 import userRouter from "./src/routes/userRouter.js";
 import hotelRouter from "./src/routes/hotelRouter.js";
 import roomRouter from "./src/routes/roomRouter.js";
-import { saveLog } from "./src/utils/logs.js";
+import { notFoundPage } from "./src/utils/logs.js";
 import bookingRouter from "./src/routes/bookingRouter.js";
 
 const PORT = process.env.PORT || 3000;
@@ -33,7 +33,7 @@ app.use("/room", authorize(["OWNER"]), roomRouter);
 
 app.use("/booking", bookingRouter);
 
-app.use(saveLog);
+app.use(notFoundPage);
 
 app.listen(PORT, () => {
     console.log("Server listening on port", PORT);
