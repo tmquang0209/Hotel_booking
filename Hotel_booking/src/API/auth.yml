@@ -1,0 +1,163 @@
+# tags
+tags:
+    - name: Auth
+      description: Authentication
+
+# paths
+paths:
+    /auth/login:
+        post:
+            tags:
+                - Auth
+            summary: Login
+            description: Login to the application
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserLogin"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/TokenResponseSuccess"
+                "400":
+                    description: Input data is invalid
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/LoginFail"
+
+    /auth/signup:
+        post:
+            tags:
+                - Auth
+            summary: Sign up
+            description: Sign up to the application
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserSignup"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/SignupSuccess"
+
+                "400":
+                    description: Input data is invalid or user already exists
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: false
+                                    message:
+                                        type: string
+                                        example: "User is already exists"
+                                    data:
+                                        type: object
+                                        example: {}
+    /auth/refresh-token:
+        post:
+            tags:
+                - Auth
+            summary: Refresh token
+            description: Refresh the token
+            security:
+                - BearerAuth: []
+            parameters:
+                - in: cookie
+                  name: refreshToken
+                  schema:
+                      type: string
+                  required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/TokenResponseSuccess"
+                "401":
+                    description: "Refresh token is invalid"
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: false
+                                    message:
+                                        type: string
+                                        example: "Refresh token is invalid"
+                                    data:
+                                        type: object
+                                        example: {}
+                "403":
+                    description: "Access token is invalid"
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: false
+                                    message:
+                                        type: string
+                                        example: "Authentication header is required"
+                                    data:
+                                        type: object
+                                        example: {}
+    /auth/logout:
+        post:
+            tags:
+                - Auth
+            summary: Logout
+            description: Logout the user
+            security:
+                - BearerAuth: []
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    message:
+                                        type: string
+                                        example: "Logout successfully"
+                                    data:
+                                        type: object
+                                        example: {}
+                "401":
+                    description: "Access token is invalid"
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: false
+                                    message:
+                                        type: string
+                                        example: "Authentication header is required"
+                                    data:
+                                        type: object
+                                        example: {}

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-import ApiException from "./apiException";
-import { errorsCode } from "../enums/errorsCode";
+import ApiException from "./apiException.js";
+import { errorsCode } from "../enums/errorsCode.js";
 
 const generateAccessToken = (data) => {
     return jwt.sign(data, process.env.JWT_SECRET, { expiresIn: "1h" });

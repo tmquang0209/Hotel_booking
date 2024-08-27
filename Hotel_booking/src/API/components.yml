@@ -1,0 +1,823 @@
+components:
+    securitySchemes:
+        BasicAuth:
+            type: http
+            scheme: basic
+        BearerAuth:
+            type: http
+            scheme: bearer
+    schemas:
+        UserInfo:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                    example: 1
+
+                username:
+                    type: string
+                    example: johndoe
+
+                fullName:
+                    type: string
+                    example: John Doe
+
+                email:
+                    type: string
+                    format: email
+
+                phoneNumber:
+                    type: string
+                    format: phone
+                    example: 1234567890
+
+                address:
+                    type: string
+                    example: 123 Main St, City, State, Zip
+                type:
+                    type: string
+                    example: "OWNER"
+
+            required:
+                - id
+                - fullName
+                - email
+                - username
+                - phoneNumber
+                - address
+        InvalidToken:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: false
+
+                message:
+                    type: string
+                    example: Access token is invalid.
+
+                data:
+                    type: object
+                    example: {}
+        InputError:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: false
+
+                message:
+                    type: string
+                    example: Validation error.
+
+                data:
+                    type: array
+                    example:
+                        - type: field
+                          msg: Phone number must be 10-11 characters
+                          path: phoneNumber
+                          location: body
+                        - type: field
+                          msg: Phone number cannot be empty
+                          path: phoneNumber
+                          location: body
+        TokenResponseSuccess:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Refresh token successfully"
+                data:
+                    type: object
+                    properties:
+                        accessToken:
+                            type: string
+                            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0bXF1YW5nIiwicGFzc3dvcmQiOiIkMmIkMTAkanB3b2tLQkJDeHZyODNRVE14OFZ6LnZmL2hmQWhZYkJ4cUU1S3JBTlNRblcxRkVkQURjNnUiLCJ0eXBlIjoiT1dORVIiLCJpYXQiOjE3MjQ2NDMwNDcsImV4cCI6MTcyNDY0NjY0N30.uHrwDHMf-v1umf-zVO-RQO7qzsqbFEXTrYlphCUHMSw"
+                        refreshToken:
+                            type: string
+                            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0bXF1YW5nIiwidHlwZSI6Ik9XTkVSIiwiaWF0IjoxNzI0NjQyOTYxLCJleHAiOjE3MjUyNDc3NjF9.zIbQpmjG1-qQazDNFJ5Menv5EA2is_hXa2-0t9xwdeY"
+        UserLogin:
+            type: object
+            properties:
+                username:
+                    type: string
+                    example: "tmquang"
+                password:
+                    type: string
+                    format: password
+                    example: "123456"
+        LoginFail:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: false
+                message:
+                    type: string
+                    example: "Username or password is incorrect"
+                data:
+                    type: object
+                    example: {}
+        UserSignup:
+            type: object
+            properties:
+                username:
+                    type: string
+                    example: "tmquang"
+                password:
+                    type: string
+                    format: password
+                    example: "123456"
+                confirmPassword:
+                    type: string
+                    format: password
+                    example: "123456"
+                email:
+                    type: string
+                    format: email
+                    example: "tmquang0209@gmail.com"
+                fullName:
+                    type: string
+                    example: "Tran Minh Quang"
+                address:
+                    type: string
+                    example: "Vinh Phuc"
+                phoneNumber:
+                    type: string
+                    example: "0397847805"
+                type:
+                    type: string
+                    enum:
+                        - OWNER
+                        - GUEST
+                    example: "OWNER"
+        SignupSuccess:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "User is created successfully"
+                data:
+                    type: object
+                    properties:
+                        username:
+                            type: string
+                            example: "tmquang4"
+                        password:
+                            type: string
+                            example: "$2b$10$wY2l8Jhc8L2IN5SOiS/lJuAZCgVgguXh009tx8MZh64yameKNAPRe"
+                        email:
+                            type: string
+                            example: "abc@gmail.com"
+                        fullName:
+                            type: string
+                            example: "Tran Minh Quang"
+                        address:
+                            type: string
+                            example: "Vinh Phuc"
+                        phoneNumber:
+                            type: string
+                            example: "0397847805"
+                        type:
+                            type: string
+                            example: "OWNER"
+                        id:
+                            type: integer
+                            example: 27
+                    example:
+                        {
+                            "username": "tmquang4",
+                            "password": "$2b$10$wY2l8Jhc8L2IN5SOiS/lJuAZCgVgguXh009tx8MZh64yameKNAPRe",
+                            "email": "tmquang@gmail.com",
+                            "full_name": "Tran Minh Quang",
+                            "address": "Vinh Phuc",
+                            "phone_number": "0397847805",
+                            "type": "OWNER",
+                            "id": 27,
+                        }
+        BookingRequest:
+            type: object
+            properties:
+                hotelId:
+                    type: integer
+                    example: 1
+                arrivalDate:
+                    type: string
+                    format: date-time
+                    example: "2024-04-16 14:00:00"
+                departureDate:
+                    type: string
+                    format: date-time
+                    example: "2024-04-20 14:00:00"
+                numAdults:
+                    type: integer
+                    example: 2
+                numChildren:
+                    type: integer
+                    example: 0
+                rooms:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            type:
+                                type: string
+                                example: "TWIN"
+                            qty:
+                                type: integer
+                                example: 1
+                services:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            id:
+                                type: integer
+                                example: 1
+                            quantity:
+                                type: integer
+                                example: 2
+                paymentMethod:
+                    type: string
+                    example: "cash"
+            required:
+                - hotelId
+                - arrivalDate
+                - departureDate
+                - numAdults
+                - rooms
+                - paymentMethod
+        CreateBookingSuccess:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Booking created successfully"
+                data:
+                    type: object
+                    properties:
+                        id:
+                            type: integer
+                            example: 27
+                        guestId:
+                            type: integer
+                            example: 2
+                        arrivalDate:
+                            type: string
+                            format: date-time
+                            example: "2024-04-16T07:00:00.000Z"
+                        departureDate:
+                            type: string
+                            format: date-time
+                            example: "2024-04-20T07:00:00.000Z"
+                        numAdults:
+                            type: integer
+                            example: 2
+                        numChildren:
+                            type: integer
+                            example: 0
+                        status:
+                            type: string
+                            example: "pending"
+                        createAt:
+                            type: string
+                            format: date-time
+                            example: "2024-08-27T03:35:10.000Z"
+                        hotelId:
+                            type: integer
+                            example: 1
+                        rooms:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    id:
+                                        type: integer
+                                        example: 3
+                                    hotelId:
+                                        type: integer
+                                        example: 1
+                                    name:
+                                        type: string
+                                        example: "A103"
+                                    type:
+                                        type: string
+                                        example: "TWIN"
+                                    price:
+                                        type: number
+                                        format: float
+                                        example: 100000
+                                    description:
+                                        type: string
+                                        nullable: true
+                                        example: null
+                                    occupancy:
+                                        type: integer
+                                        example: 2
+                                    createAt:
+                                        type: string
+                                        format: date-time
+                                        example: "2024-08-21T02:28:38.000Z"
+                                    isBooked:
+                                        type: integer
+                                        example: 1
+                        services:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    id:
+                                        type: integer
+                                        example: 1
+                                    name:
+                                        type: string
+                                        example: "Ăn sáng"
+                                    description:
+                                        type: string
+                                        example: "Ăn sáng ngon miệng"
+                                    createAt:
+                                        type: string
+                                        format: date-time
+                                        example: "2024-08-20T15:04:03.000Z"
+                        invoice:
+                            type: object
+                            properties:
+                                id:
+                                    type: integer
+                                    example: 23
+                                bookingId:
+                                    type: integer
+                                    example: 27
+                                total:
+                                    type: number
+                                    format: float
+                                    example: 600000
+                                paymentMethod:
+                                    type: string
+                                    example: "cash"
+                                paymentDate:
+                                    type: string
+                                    nullable: true
+                                    format: date-time
+                                    example: null
+                                status:
+                                    type: string
+                                    example: "PENDING"
+                                createAt:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-08-27T03:35:10.000Z"
+                        roomPrice:
+                            type: number
+                            format: float
+                            example: 100000
+                        servicePrice:
+                            type: number
+                            format: float
+                            example: 200000
+                        totalPrice:
+                            type: number
+                            format: float
+                            example: 600000
+        BookingListResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Get booking list successfully"
+                data:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            id:
+                                type: integer
+                                example: 2
+                            guestId:
+                                type: integer
+                                example: 2
+                            arrivalDate:
+                                type: string
+                                format: date-time
+                                example: "2024-04-28T11:00:00.000Z"
+                            departureDate:
+                                type: string
+                                format: date-time
+                                example: "2024-04-29T08:00:00.000Z"
+                            numAdults:
+                                type: integer
+                                example: 3
+                            numChildren:
+                                type: integer
+                                example: 1
+                            status:
+                                type: string
+                                example: "STAYING"
+                            createAt:
+                                type: string
+                                format: date-time
+                                example: "2024-08-21T03:01:37.000Z"
+                            hotelId:
+                                type: integer
+                                example: 1
+                            rooms:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: integer
+                                            example: 5
+                                        hotelId:
+                                            type: integer
+                                            example: 1
+                                        name:
+                                            type: string
+                                            example: "A105"
+                                        type:
+                                            type: string
+                                            example: "VIP"
+                                        price:
+                                            type: number
+                                            format: float
+                                            example: 100000
+                                        description:
+                                            type: string
+                                            nullable: true
+                                            example: null
+                                        occupancy:
+                                            type: integer
+                                            example: 2
+                                        createAt:
+                                            type: string
+                                            format: date-time
+                                            example: "2024-08-21T02:30:40.000Z"
+                                        isBooked:
+                                            type: integer
+                                            example: 1
+                            services:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: integer
+                                            example: 1
+                                        name:
+                                            type: string
+                                            example: "Ăn sáng"
+                                        description:
+                                            type: string
+                                            example: "Ăn sáng ngon miệng"
+                                        createAt:
+                                            type: string
+                                            format: date-time
+                                            example: "2024-08-20T15:04:03.000Z"
+                            invoice:
+                                type: object
+                                properties:
+                                    id:
+                                        type: integer
+                                        example: 1
+                                    bookingId:
+                                        type: integer
+                                        example: 2
+                                    total:
+                                        type: number
+                                        format: float
+                                        example: 600000
+                                    paymentMethod:
+                                        type: string
+                                        example: "cash"
+                                    paymentDate:
+                                        type: string
+                                        nullable: true
+                                        format: date-time
+                                        example: "0000-00-00 00:00:00"
+                                    status:
+                                        type: string
+                                        example: "FAIL"
+                                    createAt:
+                                        type: string
+                                        format: date-time
+                                        example: "2024-08-21T03:01:37.000Z"
+        InvoiceUpdateResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Invoice updated successfully"
+                data:
+                    type: object
+                    properties:
+                        status:
+                            type: string
+                            example: "SUCCESS"
+                        id:
+                            type: integer
+                            example: 4
+                        bookingId:
+                            type: integer
+                            example: 5
+                        total:
+                            type: number
+                            format: float
+                            example: 300000
+                        paymentMethod:
+                            type: string
+                            example: "cash"
+                        paymentDate:
+                            type: string
+                            nullable: true
+                            format: date-time
+                            example: null
+                        createAt:
+                            type: string
+                            format: date-time
+                            example: "2024-08-21T06:19:09.000Z"
+        CreateRoomSuccess:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Room is created successfully"
+                data:
+                    type: object
+                    properties:
+                        id:
+                            type: integer
+                            example: 1
+                        hotelId:
+                            type: integer
+                            example: 2
+                        name:
+                            type: string
+                            example: "A404"
+                        price:
+                            type: number
+                            format: float
+                            example: 100000
+                        type:
+                            type: string
+                            example: "VIP"
+                        occupancy:
+                            type: integer
+                            example: 2
+        UpdateRoomSuccess:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Room is updated successfully"
+                data:
+                    type: object
+                    properties:
+                        id:
+                            type: integer
+                            example: 1
+                        hotelId:
+                            type: integer
+                            example: 2
+                        name:
+                            type: string
+                            example: "A404"
+                        price:
+                            type: number
+                            format: float
+                            example: 100000
+                        type:
+                            type: string
+                            example: "VIP"
+                        occupancy:
+                            type: integer
+                            example: 2
+        DeleteRoomSuccess:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Room is deleted successfully"
+                data:
+                    type: object
+                    example: {}
+        AccessDenied:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: false
+                message:
+                    type: string
+                    example: "You do not have permission to access this resource"
+        HotelRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                    example: "Hotel 1"
+                address:
+                    type: string
+                    example: "Ha Noi"
+                phoneNumber:
+                    type: string
+                    example: "0975385643"
+                email:
+                    type: string
+                    format: email
+                    example: "example@example.com"
+                services:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            id:
+                                type: integer
+                                example: 1
+                            price:
+                                type: number
+                                format: float
+                                example: 100000
+        HotelCreationResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Create a new hotel successfully"
+                data:
+                    type: object
+                    properties:
+                        id:
+                            type: integer
+                            example: 21
+                        name:
+                            type: string
+                            example: "Hotel 1"
+                        address:
+                            type: string
+                            example: "Ha Noi"
+                        phoneNumber:
+                            type: string
+                            example: "0975385643"
+                        email:
+                            type: string
+                            format: email
+                            example: "Earline17@hotmail.com"
+                        status:
+                            type: integer
+                            example: 1
+                        ownerId:
+                            type: integer
+                            example: 1
+                        createAt:
+                            type: string
+                            format: date-time
+                            example: "2024-08-26T07:13:20.000Z"
+                        services:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    id:
+                                        type: integer
+                                        example: 1
+                                    price:
+                                        type: number
+                                        format: float
+                                        example: 100000
+        HotelDetailsResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Get hotel details successfully"
+                data:
+                    type: object
+                    properties:
+                        id:
+                            type: integer
+                            example: 1
+                        name:
+                            type: string
+                            example: "Hotel 1"
+                        address:
+                            type: string
+                            example: "Ha Noi"
+                        phoneNumber:
+                            type: string
+                            example: "0975385643"
+                        email:
+                            type: string
+                            format: email
+                            example: "Amari_Bernhard@yahoo.com"
+                        status:
+                            type: integer
+                            example: 1
+                        ownerId:
+                            type: integer
+                            example: 1
+                        createAt:
+                            type: string
+                            format: date-time
+                            example: "2024-08-20T15:03:33.000Z"
+                        services:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    hotelId:
+                                        type: integer
+                                        example: 1
+                                    serviceId:
+                                        type: integer
+                                        example: 1
+                                    price:
+                                        type: number
+                                        format: float
+                                        example: 100000
+                                    createAt:
+                                        type: string
+                                        format: date-time
+                                        example: "2024-08-21T02:58:42.000Z"
+        HotelListResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Get hotel list successfully"
+                data:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            id:
+                                type: integer
+                                example: 1
+                            name:
+                                type: string
+                                example: "Hotel 1"
+                            address:
+                                type: string
+                                example: "Ha Noi"
+                            phoneNumber:
+                                type: string
+                                example: "0975385643"
+                            email:
+                                type: string
+                                format: email
+                                example: "Amari_Bernhard@yahoo.com"
+                            status:
+                                type: integer
+                                example: 1
+                            ownerId:
+                                type: integer
+                                example: 1
+                            createAt:
+                                type: string
+                                format: date-time
+                                example: "2024-08-20T15:03:33.000Z"
+        DeleteHotelResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    example: "Delete hotel successfully"
+                data:
+                    type: object
+                    example: {}

@@ -1,0 +1,109 @@
+components:
+    schemas:
+
+
+tags:
+    name: User
+    description: User API
+
+paths:
+    /user/info:
+        get:
+            tags: [User]
+            summary: Get user info
+            description: Get user info
+            security:
+                - BearerAuth: []
+            responses:
+                200:
+                    description: Successful operation
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/UserInfo"
+                403:
+                    description: Authorization error, could be due to an invalid token.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InvalidToken"
+    /user/update:
+        put:
+            tags: [User]
+            description: Update user info
+            security:
+                - BearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserInfo"
+            responses:
+                200:
+                    description: Successful operation
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/UserInfo"
+                403:
+                    description: Authorization error, could be due to an invalid token.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InvalidToken"
+    /user/change-password:
+        put:
+            tags: [User]
+            description: Change user password
+            security:
+                - BearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                oldPassword:
+                                    type: string
+                                    example: "oldpassword"
+                                newPassword:
+                                    type: string
+                                    example: "newpassword"
+                                confirmPassword:
+                                    type: string
+                                    example: "newpassword"
+                            required:
+                                - oldPassword
+                                - newPassword
+                                - confirmPassword
+
+            responses:
+                200:
+                    description: Update user password successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    message:
+                                        type: string
+                                        example: Change password successfully
+
+                400:
+                    description: Bad request, could be due to invalid input.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InputError"
+
+                403:
+                    description: Authorization error, could be due to an invalid token.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InvalidToken"

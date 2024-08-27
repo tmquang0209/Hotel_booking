@@ -8,9 +8,9 @@ const bookingRouter = express.Router();
 
 bookingRouter.post("/create", authorize(["GUEST"]), bookingValidation, validateError, createBooking);
 
-bookingRouter.get("/details", getBookingDetails);
+bookingRouter.get("/details", authorize(["GUEST", "OWNER"]), getBookingDetails);
 
-bookingRouter.get("/list", getBookingList);
+bookingRouter.get("/list", authorize(["GUEST", "OWNER"]), getBookingList);
 
 bookingRouter.put("/update", authorize(["OWNER"]), bookingValidation, validateError, updateBooking);
 

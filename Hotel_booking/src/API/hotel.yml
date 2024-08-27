@@ -1,0 +1,193 @@
+tags:
+    name: Hotel
+    description: This API allows hoteliers to create and manage their hotels.
+
+components:
+    schemas:
+
+paths:
+    /hotel/create:
+        post:
+            tags: [Hotel]
+            summary: Create a new hotel
+            description: Create a new hotel
+            security:
+                - BearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/HotelInput"
+            responses:
+                200:
+                    description: Create new hotel successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HotelCreationResponse"
+
+                400:
+                    description: Bad request, could be due to invalid input data.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InputError"
+                401:
+                    description: Unauthorized, you do not have permission to access this resource.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AccessDenied"
+                403:
+                    description: Authorization error, could be due to an invalid token.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InvalidToken"
+    /hotel/details:
+        get:
+            tags: [Hotel]
+            summary: Get hotel details
+            description: Get hotel details
+            security:
+                - BearerAuth: []
+            parameters:
+                - in: query
+                  name: id
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    description: Get hotel details successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HotelDetailsResponse"
+
+                400:
+                    description: Bad request, could be due to invalid input data.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InputError"
+                401:
+                    description: Unauthorized, you do not have permission to access this resource.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AccessDenied"
+                403:
+                    description: Authorization error, could be due to an invalid token.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InvalidToken"
+    /hotel/all:
+        get:
+            tags: [Hotel]
+            summary: Get all hotels
+            description: Get all hotels
+            security:
+                - BearerAuth: []
+            responses:
+                200:
+                    description: Get hotel list successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HotelListResponse"
+                400:
+                    description: Bad request, could be due to invalid input data.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InputError"
+                401:
+                    description: Unauthorized, you do not have permission to access this resource.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AccessDenied"
+
+                403:
+                    description: Authorization error, could be due to an invalid token.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InvalidToken"
+    /hotel/update:
+        put:
+            tags: [Hotel]
+            summary: Update hotel info
+            description: Update hotel info
+            security:
+                - BearerAuth: []
+            parameters:
+                - in: query
+                  name: id
+                  schema:
+                      type: integer
+
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/HotelInput"
+            responses:
+                200:
+                    description: Update hotel info successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HotelCreationResponse"
+                400:
+                    description: Bad request, could be due to invalid input data.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InputError"
+                401:
+                    description: Unauthorized, you do not have permission to access this resource.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AccessDenied"
+                403:
+                    description: Authorization error, could be due to an invalid token.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InvalidToken"
+    /hotel/delete:
+        delete:
+            tags: [Hotel]
+            summary: Delete hotel
+            description: Delete hotel
+            security:
+                - BearerAuth: []
+            parameters:
+                - in: query
+                  name: id
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    description: Delete hotel successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/DeleteHotelResponse"
+                401:
+                    description: Unauthorized, you do not have permission to access this resource.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AccessDenied"
+                403:
+                    description: Authorization error, could be due to an invalid token.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/InvalidToken"

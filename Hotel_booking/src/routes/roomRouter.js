@@ -10,7 +10,7 @@ roomRouter.post("/create", authorize(["OWNER"]), roomValidation, validateError, 
 
 roomRouter.get("/details", getDetails);
 
-roomRouter.get("/list-by-house", getByHouse);
+roomRouter.get("/list-by-hotel", getByHouse);
 
 roomRouter.put("/update", authorize(["OWNER"]), roomValidation, validateError, updateDetails);
 

@@ -144,10 +144,10 @@ describe("GET /room/details", () => {
     });
 });
 
-describe("GET /room/list-by-house", () => {
+describe("GET /room/list-by-hotel", () => {
     it("Should return data of rooms", async () => {
         const response = await request(app)
-            .get("/room/list-by-house")
+            .get("/room/list-by-hotel")
             .query({
                 id: 1,
             })
