@@ -41,19 +41,19 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/CreateRoomSuccess"
                 "400":
-                    description: "Invalid input"
+                    description: "Bad request, could be due to invalid input."
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/InputError"
+                                $ref: "#/components/schemas/ValidationError"
                 "401":
-                    description: "Unauthorized"
+                    description: "Unauthorized. Only hotel owners can create rooms."
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/AccessDenied"
                 "403":
-                    description: "Forbidden"
+                    description: "Forbidden. You must be logged in create a room."
                     content:
                         application/json:
                             schema:
@@ -93,19 +93,19 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/UpdateRoomSuccess"
                 "400":
-                    description: "Invalid input"
+                    description: "Bad request, could be due to invalid input."
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/InputError"
+                                $ref: "#/components/schemas/ValidationError"
                 "401":
-                    description: "Unauthorized"
+                    description: "Unauthorized. Only hotel owners can update rooms."
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/AccessDenied"
                 "403":
-                    description: "Forbidden"
+                    description: "Forbidden. You must be logged in update a room."
                     content:
                         application/json:
                             schema:
@@ -128,7 +128,7 @@ paths:
     /room/list-by-hotel:
         get:
             tags: [Room]
-            summary: Get list of rooms by hotel
+            summary: Get list of rooms by hotel. This is public API
             security:
                 - BearerAuth: []
             parameters:
@@ -160,13 +160,13 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DeleteRoomSuccess"
                 "401":
-                    description: "Unauthorized"
+                    description: "Unauthorized. Only hotel owners can delete rooms."
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/AccessDenied"
                 "403":
-                    description: "Forbidden"
+                    description: "Forbidden. You must be logged in delete a room."
                     content:
                         application/json:
                             schema:

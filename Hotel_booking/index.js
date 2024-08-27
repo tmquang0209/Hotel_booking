@@ -24,7 +24,7 @@ const swaggerDefinition = {
     info: {
         title: "API Documentation",
         version: "1.0.0",
-        description: "A simple Express API",
+        description: "OpenAPI documentation for the booking hotel project. This API is used to manage users, hotels, rooms, and bookings.",
     },
     servers: [
         {

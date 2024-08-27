@@ -46,6 +46,7 @@ components:
                 - username
                 - phoneNumber
                 - address
+                - type
         InvalidToken:
             type: object
             properties:
@@ -60,7 +61,7 @@ components:
                 data:
                     type: object
                     example: {}
-        InputError:
+        ValidationError:
             type: object
             properties:
                 success:
@@ -100,7 +101,7 @@ components:
                         refreshToken:
                             type: string
                             example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0bXF1YW5nIiwidHlwZSI6Ik9XTkVSIiwiaWF0IjoxNzI0NjQyOTYxLCJleHAiOjE3MjUyNDc3NjF9.zIbQpmjG1-qQazDNFJ5Menv5EA2is_hXa2-0t9xwdeY"
-        UserLogin:
+        LoginRequest:
             type: object
             properties:
                 username:
@@ -122,7 +123,7 @@ components:
                 data:
                     type: object
                     example: {}
-        UserSignup:
+        SignUpRequest:
             type: object
             properties:
                 username:
@@ -155,7 +156,7 @@ components:
                         - OWNER
                         - GUEST
                     example: "OWNER"
-        SignupSuccess:
+        SignUpSuccess:
             type: object
             properties:
                 success:
@@ -662,7 +663,7 @@ components:
                                 type: number
                                 format: float
                                 example: 100000
-        HotelCreationResponse:
+        HotelResponse:
             type: object
             properties:
                 success:
@@ -809,7 +810,7 @@ components:
                                 type: string
                                 format: date-time
                                 example: "2024-08-20T15:03:33.000Z"
-        DeleteHotelResponse:
+        HotelDeleteResponse:
             type: object
             properties:
                 success:

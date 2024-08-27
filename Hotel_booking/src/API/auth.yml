@@ -16,7 +16,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/UserLogin"
+                            $ref: "#/components/schemas/LoginRequest"
             responses:
                 "200":
                     description: OK
@@ -42,14 +42,14 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/UserSignup"
+                            $ref: "#/components/schemas/SignUpRequest"
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/SignupSuccess"
+                                $ref: "#/components/schemas/SignUpSuccess"
 
                 "400":
                     description: Input data is invalid or user already exists
