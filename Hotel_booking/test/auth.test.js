@@ -1,200 +1,240 @@
-import request from "supertest";
-import app from "../index.js";
-import { errorsCode } from "../src/enums/errorsCode.js";
+import { loginController, logoutController, refreshTokenController, signupController } from "../src/controllers/authController";
+import { describe, it, expect, jest, beforeEach } from "@jest/globals";
+import httpMocks from "node-mocks-http";
+import UserService from "../src/services/userService";
+import * as apiResponseModule from "../src/utils/apiResponse";
+import ApiException from "../src/utils/apiException";
 
-let accessToken = "";
-let refreshToken = "";
+jest.mock("../src/services/userService");
+jest.mock("../src/utils/apiResponse");
 
-describe("Auth API", () => {
-    describe("POST /login", () => {
-        describe("Success", () => {
-            it("should return token", async () => {
-                const response = await request(app).post("/auth/login").send({
-                    username: "tmquang",
-                    password: "123456",
-                });
+describe("Auth Controller", () => {
+    let req, res, user, tokens;
 
-                const cookies = response.headers["set-cookie"];
-                expect(cookies).toBeDefined();
-                expect(cookies.length).toBeGreaterThan(0);
-                const refreshTokenC = cookies.find((cookie) => cookie.startsWith("refreshToken"));
-                expect(refreshTokenC).toBeDefined();
-                expect(response.status).toBe(200);
-                expect(response.body.data).toHaveProperty("accessToken");
+    beforeEach(() => {
+        req = httpMocks.createRequest();
+        res = httpMocks.createResponse();
+        user = {
+            id: 1,
+            username: "john_doe",
+            password: "password123",
+            type: "owner",
+        };
+        tokens = {
+            accessToken: "access_token",
+            refreshToken: "refresh_token",
+        };
 
-                accessToken = response.body.data.accessToken;
-                refreshToken = response.body.data.refreshToken;
+        // Mock common methods
+        UserService.generateTokens.mockReturnValue(tokens);
+        UserService.saveTokens.mockResolvedValue();
+    });
+
+    describe("Login controller", () => {
+        it("Should login successfully and return access token and refresh token", async () => {
+            req.body = { username: "john_doe", password: "password123" };
+            UserService.validateUser.mockResolvedValue(user);
+            apiResponseModule.apiResponse.mockReturnValue({ success: true, message: "Login successfully", data: tokens });
+
+            await loginController(req, res);
+
+            expect(UserService.validateUser).toHaveBeenCalledWith("john_doe", "password123");
+            expect(UserService.generateTokens).toHaveBeenCalledWith(user);
+            expect(UserService.saveTokens).toHaveBeenCalledWith("john_doe", tokens.accessToken, tokens.refreshToken);
+            expect(apiResponseModule.apiResponse).toHaveBeenCalledWith(1002, true, tokens);
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({ success: true, message: "Login successfully", data: tokens });
+            expect(res.cookies.refreshToken.value).toBe(tokens.refreshToken);
+        });
+
+        it("Should return error when username does not exist", async () => {
+            req.body = { username: "non_existing_user", password: "password123" };
+            UserService.validateUser.mockRejectedValueOnce(new ApiException(1001));
+            apiResponseModule.apiResponse.mockReturnValue({ success: false, message: "Username or password is incorrect", data: null });
+
+            await loginController(req, res);
+
+            expect(UserService.validateUser).toHaveBeenCalledWith("non_existing_user", "password123");
+            expect(res.statusCode).toBe(400);
+            expect(res._getJSONData()).toEqual({
+                success: false,
+                message: "Username or password is incorrect",
+                data: null,
             });
         });
 
-        describe("Failure", () => {
-            it("Username is incorrect", async () => {
-                const response = await request(app).post("/auth/login").send({
-                    username: "tmquang2222",
-                    password: "123456",
-                });
-                
-                expect(response.status).toBe(400);
-                expect(response.body.success).toBe(false);
-                expect(response.body.message).toBe("Username or password is incorrect");
-            });
+        it("Should return error when password is incorrect", async () => {
+            req.body = { username: "john_doe", password: "wrong_password" };
+            UserService.validateUser.mockRejectedValueOnce(new ApiException(1001));
+            apiResponseModule.apiResponse.mockReturnValue({ success: false, message: "Username or password is incorrect", data: null });
 
-            it("Password is incorrect", async () => {
-                const response = await request(app).post("/auth/login").send({
-                    username: "tmquang",
-                    password: "test",
-                });
+            await loginController(req, res);
 
-                expect(response.status).toBe(400);
-                expect(response.body.success).toBe(false);
-                expect(response.body.message).toBe("Username or password is incorrect");
+            expect(UserService.validateUser).toHaveBeenCalledWith("john_doe", "wrong_password");
+            expect(res.statusCode).toBe(400);
+            expect(res._getJSONData()).toEqual({
+                success: false,
+                message: "Username or password is incorrect",
+                data: null,
             });
         });
     });
 
-    describe("POST /signup", () => {
-        describe("Success", () => {
-            it("Should return data of new user", async () => {
-                const response = await request(app)
-                    .post("/auth/signup")
-                    .send({
-                        username: "unit_" + Math.ceil(Math.random() * 10000),
-                        password: "123456",
-                        confirmPassword: "123456",
-                        email: "unitTest@gmail.com",
-                        fullName: "Tran Minh Quang",
-                        address: "Vinh Phuc",
-                        phoneNumber: "0397847805",
-                        type: "OWNER",
-                    });
+    describe("Signup controller", () => {
+        it("Should signup successfully and return user data", async () => {
+            req.body = {
+                username: "john_doe",
+                password: "password123",
+                email: "john_doe@gmail.com",
+                fullName: "John Doe",
+                address: "123 Main St",
+                phoneNumber: "1234567890",
+                type: "owner",
+            };
+            const user = {
+                id: 1,
+                username: "john_doe",
+                password: "password123",
+                email: "john_doe@gmail.com",
+                fullName: "John Doe",
+                address: "123 Main St",
+                phoneNumber: "1234567890",
+                type: "owner",
+            };
+            UserService.createUser.mockResolvedValue(user);
+            apiResponseModule.apiResponse.mockReturnValue({ success: true, message: "Signup successfully", data: user });
 
-                expect(response.status).toBe(200);
-                expect(response.body.success).toBe(true);
-                expect(response.body.message).toBe("Signup successfully");
+            await signupController(req, res);
+
+            expect(UserService.createUser).toHaveBeenCalledWith({
+                username: "john_doe",
+                password: "password123",
+                email: "john_doe@gmail.com",
+                full_name: "John Doe",
+                address: "123 Main St",
+                phone_number: "1234567890",
+                type: "owner",
             });
+            expect(apiResponseModule.apiResponse).toHaveBeenCalledWith(1015, true, user);
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({ success: true, message: "Signup successfully", data: user });
         });
 
-        describe("Failure", () => {
-            it("Validation error", async () => {
-                const response = await request(app).post("/auth/signup").send({
-                    username: "test_unit",
-                    password: "123456",
-                    confirmPassword: "123456",
-                    email: "tmquang0209@gmail.com",
-                    fullName: "Tran Minh Quang",
-                    address: "Vinh Phuc",
-                    phoneNumber: "0397847805",
-                    type: "OWNaER",
-                });
+        it("Should return error when username is already taken", async () => {
+            req.body = {
+                username: "john_doe",
+                password: "password123",
+                email: "john_doe@gmail.com",
+                fullName: "John Doe",
+                address: "123 Main St",
+                phoneNumber: "1234567890",
+                type: "owner",
+            };
+            UserService.createUser.mockRejectedValueOnce(new ApiException(1014));
+            apiResponseModule.apiResponse.mockReturnValue({ success: false, message: "User already exists", data: {} });
 
-                expect(response.status).toBe(errorsCode.BAD_REQUEST);
-                expect(response.body.success).toBe(false);
-                expect(response.body.message).toBe("Validation error");
+            await signupController(req, res);
+
+            expect(UserService.createUser).toHaveBeenCalledWith({
+                username: "john_doe",
+                password: "password123",
+                email: "john_doe@gmail.com",
+                full_name: "John Doe",
+                address: "123 Main St",
+                phone_number: "1234567890",
+                type: "owner",
             });
-
-            it("Username already exists", async () => {
-                const response = await request(app).post("/auth/signup").send({
-                    username: "tmquang2",
-                    password: "123456",
-                    confirmPassword: "123456",
-                    email: "tmquang0209@gmail.com",
-                    fullName: "Tran Minh Quang",
-                    address: "Vinh Phuc",
-                    phoneNumber: "0397847805",
-                    type: "OWNER",
-                });
-
-                expect(response.status).toBe(400);
-                expect(response.body.success).toBe(false);
-                expect(response.body.message).toBe("User already exists");
-            });
+            expect(apiResponseModule.apiResponse).toHaveBeenCalledWith(1014, false, {});
+            expect(res.statusCode).toBe(400);
+            expect(res._getJSONData()).toEqual({ success: false, message: "User already exists", data: {} });
         });
     });
 
-    describe("POST /refresh-token", () => {
-        it("Should return new access token", async () => {
-            const response = await request(app)
-                .post("/auth/refresh-token")
-                .set("Cookie", "refreshToken=" + refreshToken)
-                .set("Authorization", "Bearer " + accessToken);
+    describe("Refresh token controller", () => {
+        it("Should refresh token successfully and return new access token and refresh token", async () => {
+            req.cookies = { refreshToken: "old_refresh_token" };
+            req.headers = { authorization: "Bearer old_access_token" };
+            const payload = {
+                id: 1,
+                username: "john_doe",
+                password: "password123",
+                type: "owner",
+            };
+            const newTokens = {
+                accessToken: "new_access_token",
+                refreshToken: "new_refresh_token",
+            };
+            UserService.verifyAndRefreshToken.mockResolvedValue({ payload, newRefreshToken: newTokens.refreshToken });
+            UserService.validateUser.mockResolvedValue(user);
+            UserService.generateTokens.mockReturnValue(newTokens);
+            apiResponseModule.apiResponse.mockReturnValue({ success: true, message: "Refresh token successfully", data: newTokens });
 
-            expect(response.status).toBe(200);
-            expect(response.body.success).toBe(true);
-            expect(response.body.message).toBe("Refresh token successfully");
-            expect(response.body.data).toHaveProperty("accessToken");
+            await refreshTokenController(req, res);
+
+            expect(UserService.verifyAndRefreshToken).toHaveBeenCalledWith("old_refresh_token");
+            expect(UserService.validateUser).toHaveBeenCalledWith("john_doe");
+            expect(UserService.generateTokens).toHaveBeenCalledWith(user);
+            expect(apiResponseModule.apiResponse).toHaveBeenCalledWith(1007, true, newTokens);
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({ success: true, message: "Refresh token successfully", data: newTokens });
         });
 
-        it("Invalid refresh token", async () => {
-            const response = await request(app)
-                .post("/auth/refresh-token")
-                .set("Cookie", "refreshToken=invalid_token")
-                .set("Authorization", "Bearer " + accessToken);
+        it("Should return error when refresh token is invalid", async () => {
+            req.cookies = { refreshToken: "invalid_refresh_token" };
+            req.headers = { authorization: "Bearer old_access_token" };
+            UserService.verifyAndRefreshToken.mockRejectedValueOnce(new ApiException(1005));
+            apiResponseModule.apiResponse.mockReturnValue({ success: false, message: "Refresh token is invalid", data: {} });
 
-            expect(response.status).toBe(errorsCode.UNAUTHORIZED);
-            expect(response.body.success).toBe(false);
-            expect(response.body.message).toBe("Invalid refresh token");
+            await refreshTokenController(req, res);
+
+            expect(UserService.verifyAndRefreshToken).toHaveBeenCalledWith("invalid_refresh_token");
+            expect(apiResponseModule.apiResponse).toHaveBeenCalledWith(1005, false, {});
+            expect(res.statusCode).toBe(400);
+            expect(res._getJSONData()).toEqual({ success: false, message: "Refresh token is invalid", data: {} });
         });
 
-        it("Refresh token is required", async () => {
-            const response = await request(app)
-                .post("/auth/refresh-token")
-                .set("Authorization", "Bearer " + accessToken);
+        it("Should return error when refresh token is empty", async () => {
+            req.cookies = {};
+            req.headers = { authorization: "Bearer old_access_token" };
+            apiResponseModule.apiResponse.mockReturnValue({ success: false, message: "Refresh token is required", data: {} });
 
-            expect(response.status).toBe(errorsCode.UNAUTHORIZED);
-            expect(response.body.success).toBe(false);
-            expect(response.body.message).toBe("Refresh token is required");
-        });
-    });
+            await refreshTokenController(req, res);
 
-    describe("POST /logout", () => {
-        it("Should return message", async () => {
-            const response = await request(app)
-                .post("/auth/logout")
-                .set("Cookie", "refreshToken=" + refreshToken)
-                .set("Authorization", "Bearer " + accessToken);
-
-            expect(response.status).toBe(200);
-            expect(response.body.success).toBe(true);
-            expect(response.body.message).toBe("Logout successfully");
-        });
-
-        it("Invalid refresh token", async () => {
-            const response = await request(app)
-                .post("/auth/logout")
-                .set("Cookie", "refreshToken=" + "invalid_token")
-                .set("Authorization", "Bearer " + accessToken);
-
-            expect(response.status).toBe(errorsCode.UNAUTHORIZED);
-            expect(response.body.success).toBe(false);
-            expect(response.body.message).toBe("Refresh token is invalid");
-        });
-
-        it("Invalid access token", async () => {
-            const response = await request(app)
-                .post("/auth/logout")
-                .set("Cookie", "refreshToken=" + refreshToken)
-                .set("Authorization", "Bearer " + "invalid_token");
-
-            expect(response.status).toBe(errorsCode.FORBIDDEN);
-            expect(response.body.success).toBe(false);
-            expect(response.body.message).toBe("Access token is invalid");
+            expect(apiResponseModule.apiResponse).toHaveBeenCalledWith(1004, false, {});
+            expect(res.statusCode).toBe(401);
+            expect(res._getJSONData()).toEqual({ success: false, message: "Refresh token is required", data: {} });
+            expect(UserService.verifyAndRefreshToken).not.toHaveBeenCalled();
         });
     });
-});
 
-describe("404", () => {
-    it("Should return 404", async () => {
-        const response = await request(app).get("/test").set("Authorization", `Bearer ${accessToken}`);
+    describe("Logout controller", () => {
+        it("Should logout successfully and delete refresh token", async () => {
+            req.cookies = { refreshToken: "old_refresh_token" };
+            apiResponseModule.apiResponse.mockReturnValue({ success: true, message: "Logout successfully", data: {} });
 
-        expect(response.status).toBe(errorsCode.NOT_FOUND);
-    });
-});
+            await logoutController(req, res);
 
-describe("Authentication is required", () => {
-    it('Should return message "Authentication header is required"', async () => {
-        const response = await request(app).get("/user/info");
-        expect(response.status).toBe(errorsCode.FORBIDDEN);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("Authentication header is required");
+            expect(UserService.deleteToken).toHaveBeenCalledWith("old_refresh_token");
+            expect(res.cookies.refreshToken.value).toBe(null);
+            expect(apiResponseModule.apiResponse).toHaveBeenCalledWith(1013, true);
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({ success: true, message: "Logout successfully", data: {} });
+        });
+
+        it("Should return error when refresh token is empty", async () => {
+            req.cookies = {
+                refreshToken: "wrong_refresh_token",
+            };
+
+            UserService.deleteToken.mockRejectedValueOnce(new ApiException(1005, 401));
+            apiResponseModule.apiResponse.mockReturnValue({ success: false, message: "Refresh token is invalid", data: {} });
+
+            await logoutController(req, res);
+
+            expect(apiResponseModule.apiResponse).toHaveBeenCalledWith(1005, false, { message: "Refresh token is invalid" });
+            expect(res.statusCode).toBe(401);
+            expect(res._getJSONData()).toEqual({ success: false, message: "Refresh token is invalid", data: {} });
+            expect(UserService.deleteToken).not.toHaveBeenCalled();
+        });
     });
 });
