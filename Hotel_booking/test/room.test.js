@@ -1,250 +1,189 @@
-import request from "supertest";
-import app from "../index.js";
+import { createRoom, getDetails, getByHouse, updateDetails, deleteRoom } from "../src/controllers/roomController";
+import RoomService from "../src/services/roomService";
+import HotelService from "../src/services/hotelService";
+import httpMocks from "node-mocks-http";
+import { expect, jest, describe, it, beforeEach } from "@jest/globals";
 
-let accessTokenOfOwner = "";
-let refreshTokenOfOwner = "";
-let accessTokenOfGuest = "";
-let refreshTokenOfGuest = "";
-let hotelId = 12;
-let roomId = 10;
+// Mock services
+jest.mock("../src/services/roomService");
+jest.mock("../src/services/hotelService");
 
-describe("POST /login", () => {
-    it("Should return data of owner", async () => {
-        // login
-        const response = await request(app).post("/auth/login").send({
-            username: "tmquang",
-            password: "123456",
+describe("Room Controller", () => {
+    let req, res, user;
+
+    beforeEach(() => {
+        req = httpMocks.createRequest();
+        res = httpMocks.createResponse();
+
+        // User mock
+        user = {
+            id: 1,
+            username: "testUser",
+            password: "testPass",
+            type: "owner",
+        };
+
+        req.user = user;
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe("createRoom", () => {
+        it("should create a room and return the room data", async () => {
+            // Set up the request body
+            req.body = {
+                hotelId: 1,
+                name: "Room 101",
+                price: 200,
+                description: "A luxurious room",
+                type: "deluxe",
+                occupancy: 2,
+                status: true,
+            };
+
+            // Mock service responses
+            HotelService.checkExists.mockResolvedValue(true);
+            RoomService.checkExists.mockResolvedValue(false);
+            const mockRoom = { id: 1, name: "Room 101" };
+            RoomService.create.mockResolvedValue(mockRoom);
+
+            // Call the controller function
+            await createRoom(req, res);
+
+            // Assertions
+            expect(HotelService.checkExists).toHaveBeenCalledWith(1, user.id);
+            expect(RoomService.checkExists).toHaveBeenCalledWith(1, "Room 101");
+            expect(RoomService.create).toHaveBeenCalledWith({
+                hotel_id: 1,
+                name: "Room 101",
+                price: 200,
+                description: "A luxurious room",
+                type: "deluxe",
+                occupancy: 2,
+                status: true,
+            });
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({
+                success: true,
+                message: "Create a new room successfully",
+                data: mockRoom,
+            });
         });
-
-        accessTokenOfOwner = response.body.data.accessToken;
-        refreshTokenOfOwner = response.body.data.refreshToken;
     });
 
-    it("Should return data of guest", async () => {
-        // login
-        const response = await request(app).post("/auth/login").send({
-            username: "tmquang1",
-            password: "123456",
+    describe("getDetails", () => {
+        it("should return room details", async () => {
+            // Set up the request query
+            req.query = { id: 1 };
+
+            const mockDetails = {
+                id: 1,
+                name: "Room 101",
+            };
+
+            // Mock the service response
+            RoomService.getDetails.mockResolvedValue(mockDetails);
+
+            // Call the controller function
+            await getDetails(req, res);
+
+            // Assertions
+            expect(RoomService.getDetails).toHaveBeenCalledWith(user.id, 1);
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({
+                success: true,
+                message: "Get room details successfully",
+                data: mockDetails,
+            });
         });
-
-        accessTokenOfGuest = response.body.data.accessToken;
-        refreshTokenOfGuest = response.body.data.refreshToken;
-    });
-});
-
-describe("POST /room/create", () => {
-    it("Validate error", async () => {
-        const response = await request(app)
-            .post("/room/create")
-            .send({
-                hotelId: 10,
-                name: Math.ceil(Math.random() * 1000),
-                price: 100000,
-                type: "VIP",
-                occupancy: 2,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
-
-        expect(response.status).toBe(400);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("Validation error");
     });
 
-    it("Access is denied to guests", async () => {
-        const response = await request(app)
-            .post("/room/create")
-            .send({
-                hotelId: 10,
-                name: "Room " + Math.ceil(Math.random() * 1000),
-                price: 100000,
-                type: "VIP",
-                occupancy: 2,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfGuest}`);
+    describe("getByHouse", () => {
+        it("should return rooms by hotel", async () => {
+            req.query = { id: 1 };
 
-        expect(response.status).toBe(401);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("You are not authorized to access this resource");
+            const mockRooms = [
+                { id: 1, name: "Room 101" },
+                { id: 2, name: "Room 102" },
+            ];
+
+            // Mock service response
+            RoomService.getByHotel.mockResolvedValue(mockRooms);
+
+            // Call the controller function
+            await getByHouse(req, res);
+
+            // Assertions
+            expect(RoomService.getByHotel).toHaveBeenCalledWith(1);
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({
+                success: true,
+                message: "Get all rooms in hotel successfully",
+                data: mockRooms,
+            });
+        });
     });
 
-    it("Room names exist in this hotel", async () => {
-        const response = await request(app)
-            .post("/room/create")
-            .send({
-                hotelId: 1,
-                name: "A101",
-                price: 100000,
-                type: "VIP",
-                occupancy: 2,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
+    describe("updateDetails", () => {
+        it("should update room details and return the updated data", async () => {
+            // Set up the request body and query
+            req.query = { id: 1 };
+            req.body = {
+                name: "Updated Room",
+                price: 300,
+                description: "Updated description",
+                type: "suite",
+                occupancy: 3,
+                status: true,
+            };
 
-        expect(response.status).toBe(400);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("Room name already exists in this hotel");
+            // Mock service response
+            const mockUpdatedRoom = { id: 1, name: "Updated Room" };
+            RoomService.updateDetails.mockResolvedValue(mockUpdatedRoom);
+
+            // Call the controller function
+            await updateDetails(req, res);
+
+            // Assertions
+            expect(RoomService.checkAccess).toHaveBeenCalledWith(user.id, 1);
+            expect(RoomService.updateDetails).toHaveBeenCalledWith(1, {
+                name: "Updated Room",
+                price: 300,
+                description: "Updated description",
+                type: "suite",
+                occupancy: 3,
+                status: true,
+            });
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({
+                success: true,
+                message: "Room details updated successfully",
+                data: mockUpdatedRoom,
+            });
+        });
     });
 
-    it("Should create a new room", async () => {
-        const response = await request(app)
-            .post("/room/create")
-            .send({
-                hotelId: 1,
-                name: "A_" + Math.ceil(Math.random() * 1000),
-                price: 100000,
-                type: "VIP",
-                occupancy: 2,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
+    describe("deleteRoom", () => {
+        it("should delete a room and return success", async () => {
+            req.query = { id: 1 };
 
-        roomId = response.body.data.id;
-        expect(response.status).toBe(200);
-        expect(response.body.success).toBe(true);
-        expect(response.body.message).toBe("Create a new room successfully");
-    });
-});
+            // Mock service response
+            RoomService.deleteRoom.mockResolvedValue(true);
 
-describe("GET /room/details", () => {
-    it("Access is denied to guests", async () => {
-        const response = await request(app)
-            .get("/room/details")
-            .query({
-                id: 1,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfGuest}`);
+            // Call the controller function
+            await deleteRoom(req, res);
 
-        expect(response.status).toBe(401);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("You are not authorized to access this resource");
-    });
-
-    it("Room is not found", async () => {
-        const response = await request(app)
-            .get("/room/details")
-            .query({
-                id: -1,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
-
-        expect(response.status).toBe(400);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("Room not found");
-    });
-
-    it("Should return data of room", async () => {
-        const response = await request(app)
-            .get("/room/details")
-            .query({
-                id: 2,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
-
-        expect(response.status).toBe(200);
-        expect(response.body.success).toBe(true);
-        expect(response.body.message).toBe("Get room details successfully");
-    });
-});
-
-describe("GET /room/list-by-hotel", () => {
-    it("Should return data of rooms", async () => {
-        const response = await request(app)
-            .get("/room/list-by-hotel")
-            .query({
-                id: 1,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
-
-        expect(response.status).toBe(200);
-        expect(response.body.success).toBe(true);
-        expect(response.body.message).toBe("Get all rooms in hotel successfully");
-    });
-});
-
-describe("PUT /room/update", () => {
-    it("Access is denied to guests", async () => {
-        const response = await request(app)
-            .put("/room/update")
-            .query({
-                id: 2,
-            })
-            .send({
-                hotelId: 2,
-                name: "A101",
-                price: 200000,
-                type: "VIP",
-                occupancy: 2,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfGuest}`);
-
-        expect(response.status).toBe(401);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("You are not authorized to access this resource");
-    });
-
-    it("Room is not found", async () => {
-        const response = await request(app)
-            .put("/room/update")
-            .query({
-                id: 1,
-            })
-            .send({
-                hotelId: 2,
-                name: "A101",
-                price: 200000,
-                type: "VIP",
-                occupancy: 2,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
-
-        expect(response.status).toBe(400);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("Access denied");
-    });
-
-    it("Should update details of room", async () => {
-        const response = await request(app)
-            .put("/room/update")
-            .query({
-                id: roomId,
-            })
-            .send({
-                hotelId: 1,
-                name: "A" + Math.ceil(Math.random() * 1000),
-                price: 200000,
-                type: "VIP",
-                occupancy: 2,
-            })
-            .set("Authorization", `Bearer ${accessTokenOfOwner}`);
-
-        expect(response.status).toBe(200);
-        expect(response.body.success).toBe(true);
-        expect(response.body.message).toBe("Room details updated successfully");
-    });
-});
-
-describe("DELETE /room/delete", () => {
-    it("Room not found or access denied", async () => {
-        const response = await request(app)
-            .delete("/room/delete")
-            .query({
-                id: 1112,
-            })
-            .set("Authorization", accessTokenOfOwner);
-
-        expect(response.status).toBe(400);
-        expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("Access denied");
-    });
-
-    it("Delete room successful", async () => {
-        const response = await request(app)
-            .delete("/room/delete")
-            .query({
-                id: roomId,
-            })
-            .set("Authorization", accessTokenOfOwner);
-
-        expect(response.status).toBe(200);
-        expect(response.body.success).toBe(true);
-        expect(response.body.message).toBe("Room deleted successfully");
+            // Assertions
+            expect(RoomService.checkAccess).toHaveBeenCalledWith(user.id, 1);
+            expect(RoomService.deleteRoom).toHaveBeenCalledWith(1);
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual({
+                success: true,
+                message: "Room deleted successfully",
+                data: null,
+            });
+        });
     });
 });

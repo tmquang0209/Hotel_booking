@@ -104,7 +104,7 @@ class UserService {
         }
 
         const encryptPassword = await hashPassword(newPassword);
-        const change = await Users.query().patchAndFetchById(user.id, { password: encryptPassword }).where("id", user.id);
+        const change = await Users.query().patchAndFetchById(user.id, { password: encryptPassword });
 
         return change;
     }
