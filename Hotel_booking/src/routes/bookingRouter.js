@@ -17,5 +17,5 @@ bookingRouter.put("/update", authorize(["OWNER"]), bookingValidation, validateEr
 bookingRouter.put("/update-status", authorize(["GUEST", "OWNER"]), bookingStatus, validateError, updateStatus);
 
 bookingRouter.put("/update-payment", authorize(["OWNER"]), updatePayment);
-
+// patch
 export default bookingRouter;

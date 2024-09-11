@@ -42,7 +42,6 @@ export async function createBooking(req, res) {
         // create booking details
         if (rooms) {
             const roomDetails = await BookingService.addRooms(booking.id, hotelId, rooms);
-
             totalRoomPrice += roomDetails.totalRoomPrice;
         }
 
