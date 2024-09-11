@@ -9,11 +9,9 @@ class UserService {
     static async validateUser(username, password = null) {
         const user = await Users.query().findOne({ username });
         if (!user) {
-            throw new ApiException(1001);
-        }
-
-        if (password && !(await comparePassword(password, user.password))) {
-            throw new ApiException(1001);
+            throw new ApiException(1001); // Username doesn't exist
+        } else if (!(await comparePassword(password, user.password))) {
+            throw new ApiException(1001); // Password mismatch
         }
 
         return user;
@@ -106,7 +104,7 @@ class UserService {
         }
 
         const encryptPassword = await hashPassword(newPassword);
-        const change = await Users.query().patchAndFetchById(user.id, { password: encryptPassword }).where("id", user.id);
+        const change = await Users.query().patchAndFetchById(user.id, { password: encryptPassword });
 
         return change;
     }
