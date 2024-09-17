@@ -12,7 +12,11 @@ async function loginController(req, res) {
 
         const { accessToken, refreshToken } = UserService.generateTokens(user);
 
+        // Set the refresh token in the cookie
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+
+        // Save the refresh token in the redis (username, refreshToken, accessToken pair)
+        // await hSetAsync("refreshTokens", username, refreshToken, accessToken);
 
         await UserService.saveTokens(username, accessToken, refreshToken);
 
@@ -45,30 +49,33 @@ async function signupController(req, res) {
 }
 
 async function refreshTokenController(req, res) {
+    const refreshToken = req.cookies.refreshToken;
+    const accessToken = req.headers.authorization;
+
+    if (!refreshToken) {
+        throw new ApiException(1004, errorsCode.UNAUTHORIZED);
+    }
     try {
-        const refreshToken = req.cookies.refreshToken;
-
-        if (!refreshToken) {
-            throw new ApiException(1004, errorsCode.UNAUTHORIZED);
-        }
-
-        const { payload, newRefreshToken } = await UserService.verifyAndRefreshToken(refreshToken);
+        const { payload, newRefreshToken } = await UserService.verifyAndRefreshToken(refreshToken, accessToken);
 
         const user = await UserService.validateUser(payload.username);
 
-        const accessToken = UserService.generateTokens(user).accessToken;
+        const newAccessToken = UserService.generateTokens(user).accessToken;
 
-        return res.json(apiResponse(1007, true, { accessToken, refreshToken: newRefreshToken }));
+        await UserService.saveTokens(payload.username, newAccessToken, refreshToken);
+
+        return res.json(apiResponse(1007, true, { accessToken: newAccessToken, refreshToken: newRefreshToken }));
     } catch (error) {
         Exception.handle(error, req, res);
     }
 }
 
 async function logoutController(req, res) {
+    const username = req.user.username;
     try {
         const refreshToken = req.cookies.refreshToken;
 
-        await UserService.deleteToken(refreshToken);
+        await UserService.deleteToken(username,refreshToken);
 
         res.cookie("refreshToken", null);
 
@@ -78,4 +85,4 @@ async function logoutController(req, res) {
     }
 }
 
-export { loginController, signupController, refreshTokenController, logoutController };
+export { loginController, logoutController, refreshTokenController, signupController };

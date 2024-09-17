@@ -1,25 +1,26 @@
+import bodyParser from "body-parser";
+import cors from "cors";
 import "dotenv/config";
 import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import { setup, serve } from "swagger-ui-express";
-import swaggerJSDoc from "swagger-jsdoc";
 import fs from "fs";
-import path from "path";
 import { schedule } from "node-cron";
+import path from "path";
+import swaggerJSDoc from "swagger-jsdoc";
+import { serve, setup } from "swagger-ui-express";
 import xlsx from "xlsx";
 
+import cookieParser from "cookie-parser";
 import "./src/config/database.js";
+import redisClient from "./src/config/redis.js";
 import authentication from "./src/middlewares/authentication.js";
 import authorize from "./src/middlewares/authorization.js";
+import Logs from "./src/models/logs.js";
 import authRouter from "./src/routes/authRouter.js";
-import cookieParser from "cookie-parser";
-import userRouter from "./src/routes/userRouter.js";
+import bookingRouter from "./src/routes/bookingRouter.js";
 import hotelRouter from "./src/routes/hotelRouter.js";
 import roomRouter from "./src/routes/roomRouter.js";
+import userRouter from "./src/routes/userRouter.js";
 import { notFoundPage } from "./src/utils/logs.js";
-import bookingRouter from "./src/routes/bookingRouter.js";
-import Logs from "./src/models/logs.js";
 
 const PORT = process.env.PORT || 3000;
 const swaggerDefinition = {
@@ -33,15 +34,13 @@ const swaggerDefinition = {
         {
             url: "http://localhost:3000",
         },
+        {
+            url: "https://hotel-booking-2021.herokuapp.com",
+        },
     ],
 };
 
-// // Options for the swagger docs
-// const options = {
-//     swaggerDefinition,
-//     apis:
-// };
-
+// Options for the swagger docs
 const __dirname = path.resolve();
 const apiDir = path.join(__dirname, "/src/API");
 const files = fs.readdirSync(apiDir);
