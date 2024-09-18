@@ -16,7 +16,6 @@ async function loginController(req, res) {
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
 
         // Save the refresh token in the redis (username, refreshToken, accessToken pair)
-        // await hSetAsync("refreshTokens", username, refreshToken, accessToken);
 
         await UserService.saveTokens(username, accessToken, refreshToken);
 

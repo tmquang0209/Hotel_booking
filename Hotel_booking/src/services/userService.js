@@ -48,17 +48,23 @@ class UserService {
     }
 
     static async saveTokens(username, accessToken, refreshToken) {
-        // delete old token
-        await redisClient.hDel(username, refreshToken);
-        await redisClient.hSet(username, refreshToken, accessToken);
+        await redisClient.del(`${username}:${refreshToken}`);
+        await redisClient.sAdd(`${username}:${refreshToken}`, accessToken);
+        // verify refresh token
+        const payload = verifyRefreshToken(refreshToken);
+        const expireTime = payload.exp - Math.floor(Date.now() / 1000);
+        await redisClient.expire(`${username}:${refreshToken}`, expireTime);
     }
 
     static async verifyAndRefreshToken(refreshToken, accessToken) {
         // const storedToken = await ManageAccess.query().findOne({ refresh_token: refreshToken });
+        // verify refresh token
         const payload = verifyRefreshToken(refreshToken);
-        const storedToken = await redisClient.hGetAll(payload.username);
 
-        if (!storedToken[refreshToken] || storedToken[refreshToken].trim() !== accessToken.replace("Bearer ", "").trim()) {
+        // get stored token by username in sets
+        const storedToken = await redisClient.sMembers(`${payload.username}:${refreshToken}`);
+
+        if (!storedToken || storedToken.includes(accessToken.replace("Bearer ", "").trim())) {
             throw new ApiException(1005, errorsCode.UNAUTHORIZED);
         }
 
@@ -66,7 +72,9 @@ class UserService {
     }
 
     static async deleteToken(username, refreshToken) {
-        await redisClient.hDel(username, refreshToken);
+        // delete token
+        await redisClient.del(`${username}:${refreshToken}`);
+        // await redisClient.hDel(username, refreshToken);
         // const isValid = await ManageAccess.query().findOne({ refresh_token: refreshToken });
         // if (!isValid) throw new ApiException(1005, errorsCode.UNAUTHORIZED);
         // await ManageAccess.query().delete().where("refresh_token", refreshToken);

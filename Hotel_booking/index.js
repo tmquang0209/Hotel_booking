@@ -11,9 +11,9 @@ import xlsx from "xlsx";
 
 import cookieParser from "cookie-parser";
 import "./src/config/database.js";
-import redisClient from "./src/config/redis.js";
 import authentication from "./src/middlewares/authentication.js";
 import authorize from "./src/middlewares/authorization.js";
+import upload from "./src/middlewares/upload.js";
 import Logs from "./src/models/logs.js";
 import authRouter from "./src/routes/authRouter.js";
 import bookingRouter from "./src/routes/bookingRouter.js";
@@ -55,7 +55,7 @@ const options = {
 };
 const swaggerSpec = swaggerJSDoc(options);
 
-schedule("* * * * *", async () => {
+schedule("*/60 * * * *", async () => {
     console.log("This is a scheduled task");
 
     // Get all logs from the database
@@ -79,6 +79,27 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use("/api-docs", serve, setup(swaggerSpec));
+
+app.post("/upload", upload.single("img"), (req, res) => {
+    // return the file url
+    return res.send(req.file.path);
+});
+
+app.post("/uploads", upload.array("imgs"), (req, res) => {
+    const paths = req.files.map((file) => file.path);
+    return res.send(paths);
+});
+
+app.get("/downloads/:fileName", (req, res) => {
+    const fileName = req.params.fileName;
+    const filePath = path.join(__dirname, "/uploads/", fileName);
+
+    res.download(filePath, (err) => {
+        if (err) {
+            res.status(404).send("File not found");
+        }
+    });
+});
 
 app.use(authentication);
 
