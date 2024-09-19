@@ -10,10 +10,11 @@ import { serve, setup } from "swagger-ui-express";
 import xlsx from "xlsx";
 
 import cookieParser from "cookie-parser";
+import multer from "multer";
 import "./src/config/database.js";
 import authentication from "./src/middlewares/authentication.js";
 import authorize from "./src/middlewares/authorization.js";
-import upload from "./src/middlewares/upload.js";
+import { merge, upload } from "./src/middlewares/upload.js";
 import Logs from "./src/models/logs.js";
 import authRouter from "./src/routes/authRouter.js";
 import bookingRouter from "./src/routes/bookingRouter.js";
@@ -75,31 +76,33 @@ schedule("*/60 * * * *", async () => {
 const app = express();
 
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use("/api-docs", serve, setup(swaggerSpec));
 
-app.post("/upload", upload.single("img"), (req, res) => {
-    // return the file url
-    return res.send(req.file.path);
-});
+// upload with chunk
+app.post("/upload", upload);
+app.post("/merge", merge);
 
-app.post("/uploads", upload.array("imgs"), (req, res) => {
-    const paths = req.files.map((file) => file.path);
-    return res.send(paths);
-});
-
-app.get("/downloads/:fileName", (req, res) => {
-    const fileName = req.params.fileName;
-    const filePath = path.join(__dirname, "/uploads/", fileName);
-
-    res.download(filePath, (err) => {
-        if (err) {
-            res.status(404).send("File not found");
-        }
-    });
-});
+// upload with multer
+app.post(
+    "/upload-file",
+    multer({
+        storage: multer.diskStorage({
+            destination: (req, file, cb) => {
+                cb(null, path.join(__dirname, "uploads"));
+            },
+            filename: (req, file, cb) => {
+                cb(null, file.originalname);
+            },
+        }),
+    }).single("file"),
+    (req, res) => {
+        res.send("File uploaded successfully");
+    }
+);
 
 app.use(authentication);
 

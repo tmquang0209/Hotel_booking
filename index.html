@@ -1,0 +1,60 @@
+<input type="file" id="fileInput" />
+<script>
+    const CHUNK_SIZE = 1024 * 1024; // 1MB
+
+    async function uploadFile(file) {
+        const totalSize = file.size;
+        let uploaded = 0;
+        let part = 0;
+        let totalChunks = Math.ceil(totalSize / CHUNK_SIZE);
+
+        while (uploaded < totalSize) {
+            const start = uploaded;
+            const end = Math.min(uploaded + CHUNK_SIZE, totalSize);
+
+            const formData = new FormData();
+            const chunk = file.slice(start, end);
+
+            formData.append('file', chunk, `${file.name}.part${part}`);
+            formData.append('chunkNumber', part);
+            formData.append('totalChunks', Math.ceil(totalSize / CHUNK_SIZE));
+
+            try {
+                const response = await fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                // console.log(`Uploaded part ${part}`, await response.text());
+            } catch (error) {
+                console.error('Error uploading part:', error);
+                return;
+            }
+
+            uploaded += CHUNK_SIZE;
+            part++;
+        }
+        console.log('File upload complete');
+    }
+
+    document.getElementById('fileInput').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        const startWithChunk = new Date().getTime();
+        uploadFile(file).then(() => {
+            fetch('http://localhost:3000/merge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fileName: file.name,
+                    totalChunks: Math.ceil(file.size / CHUNK_SIZE)
+                })
+            }).then((response) => {
+                // console.log('Merge response:', response);
+            })
+        }).then(() => {
+            const end = new Date().getTime();
+            console.log('Upload with chunk:', (end - startWithChunk) / 1000);
+        });
+    });
+</script>
