@@ -12,17 +12,17 @@ services:
         working_dir: /app
         command: yarn start
         environment:
-            - PORT=3000
-            - MYSQL_HOST=103.200.22.212
-            - MYSQL_PORT=3306
-            - MYSQL_USERNAME=tmquangt_hotel
-            - MYSQL_DATABASE=tmquangt_hotel
-            - MYSQL_PASSWORD=Matkhau123@@
-            - JWT_SECRET=PyCJtD935qHpaOFK6KM0DxzYTipVkNMG
-            - JWT_REFRESH=oaAq0remB5b7dCDNGyyqQjT5vSd9fzzq
-            - REDIS_HOST=hotel_redis
+            - PORT
+            - MYSQL_HOST
+            - MYSQL_PORT
+            - MYSQL_USERNAME
+            - MYSQL_DATABASE
+            - MYSQL_PASSWORD
+            - JWT_SECRET
+            - JWT_REFRESH
+            - REDIS_HOST
         networks:
-            - hotel_booking_hotel-net # Đảm bảo tên mạng chính xác
+            - hotel_booking_hotel-net
 
     redis:
         image: redis:6.0.16-alpine
@@ -31,7 +31,7 @@ services:
         ports:
             - "6379:6379"
         networks:
-            - hotel_booking_hotel-net # Đảm bảo tên mạng chính xác
+            - hotel_booking_hotel-net
         volumes:
             - redis_data:/data
 
@@ -44,7 +44,7 @@ services:
         stdin_open: true
         tty: true
         networks:
-            - hotel_booking_hotel-net # Đảm bảo tên mạng chính xác
+            - hotel_booking_hotel-net
 
 volumes:
     redis_data:
