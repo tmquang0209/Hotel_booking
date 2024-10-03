@@ -29,8 +29,3 @@ jobs:
             - name: Run ESlint
               run: yarn lint:check
 
-            - name: Archive ESlint report
-              uses: actions/upload-artifact@v2
-              with:
-                  name: eslint-results
-                  path: .eslint-results.txt
