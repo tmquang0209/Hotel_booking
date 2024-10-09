@@ -1,0 +1,19 @@
+{
+    "name": "firestore",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts"
+    },
+    "devDependencies": {
+        "dotenv": "^16.4.5",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.6.2"
+    },
+    "dependencies": {
+        "@types/express": "^5.0.0",
+        "express": "^4.21.0",
+        "firebase": "^10.14.0"
+    }
+}

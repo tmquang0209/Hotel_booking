@@ -27,7 +27,7 @@ await redisClient.zAdd("tokensSortedSet", 3, "token3");
 const tokensSortedSet = await redisClient.zRange("tokensSortedSet", 0, -1);
 console.log(tokensSortedSet);
 
-hash;
+//hash;
 await redisClient.hSet("tokensHash", "token1", "token1");
 await redisClient.hSet("tokensHash", "token2", "token2");
 await redisClient.hSet("tokensHash", "token3", "token3");
@@ -42,3 +42,4 @@ await redisClient.xAdd("tokensStream", "*", ["token", "token3"]);
 
 // get all tokens
 const tokensStream = await redisClient.xRange("tokensStream", "-", "+");
+console.log("🚀 ~ tokensStream:", tokensStream)

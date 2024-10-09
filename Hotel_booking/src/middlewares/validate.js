@@ -1,5 +1,4 @@
 import { check } from "express-validator";
-import userType from "../enums/userType.js";
 import RoomType from "../models/roomType.js";
 import ApiException from "../utils/apiException.js";
 
@@ -128,4 +127,4 @@ var bookingValidation = [
 
 var bookingStatus = [check("status").isIn(["PENDING", "CANCELLED", "CONFIRMED", "STAYING", "FINISHED"]).withMessage("Invalid status")];
 
-export { loginValidation, signupValidation, updateInfo, changePassword, createNewHotel, roomValidation, bookingValidation, bookingStatus };
+export { bookingStatus, bookingValidation, changePassword, createNewHotel, loginValidation, roomValidation, signupValidation, updateInfo };

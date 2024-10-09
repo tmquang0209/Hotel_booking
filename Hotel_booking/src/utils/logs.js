@@ -1,7 +1,7 @@
 import { errorsCode } from "../enums/errorsCode.js";
 import Logs from "../models/logs.js";
 
-export const notFoundPage = async (req, res, next) => {
+export const notFoundPage = async (req, res) => {
     const user = req?.user;
 
     const data = {

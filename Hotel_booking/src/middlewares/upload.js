@@ -10,7 +10,7 @@ fs.mkdirSync(MERGED_DIR, { recursive: true });
 
 export const upload = (req, res) => {
     const bb = busboy({ headers: req.headers });
-    bb.on("file", (fieldName, file, fileName, encoding, mimeType) => {
+    bb.on("file", (fieldName, file, fileName) => {
         const saveTo = path.join("./uploads", "chunks", fileName.filename);
         file.pipe(fs.createWriteStream(saveTo));
 

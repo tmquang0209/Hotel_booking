@@ -1,11 +1,11 @@
-import Exception from "../utils/exception.js";
-import ApiException from "../utils/apiException.js";
-import { apiResponse } from "../utils/apiResponse.js";
 import Booking from "../models/booking.js";
 import Invoices from "../models/invoices.js";
+import BookingService from "../services/bookingService.js";
 import HotelService from "../services/hotelService.js";
 import RoomService from "../services/roomService.js";
-import BookingService from "../services/bookingService.js";
+import ApiException from "../utils/apiException.js";
+import { apiResponse } from "../utils/apiResponse.js";
+import Exception from "../utils/exception.js";
 
 // create
 export async function createBooking(req, res) {
@@ -55,7 +55,7 @@ export async function createBooking(req, res) {
         const invoiceDetails = await BookingService.calculateInvoice(arrivalDate, departureDate, totalRoomPrice, totalServicePrice);
 
         totalPrice = invoiceDetails.total;
-        const days = invoiceDetails.days;
+        invoiceDetails.days;
 
         // create invoice
         await BookingService.createInvoice(booking.id, totalPrice, paymentMethod);
@@ -127,7 +127,7 @@ export async function updateBooking(req, res) {
 
         const data = await BookingService.getBookingDetails(bookingId, user);
 
-        return res.json(apiResponse(1038, true, data));
+        return res.json(apiResponse(1038, true, { ...data, totalRoomPrice, totalServicePrice }));
     } catch (error) {
         Exception.handle(error, req, res);
     }
@@ -155,7 +155,6 @@ export async function updateStatus(req, res) {
 export async function updatePayment(req, res) {
     const { id } = req.query;
     const { payment_method, status } = req.body;
-    const user = req.user;
     try {
         // check booking status
         const booking = await Booking.query().findById(id);
@@ -171,15 +170,15 @@ export async function updatePayment(req, res) {
         if (!invoice) {
             throw new ApiException(1041);
         }
-
+        var data;
         if (payment_method) {
-            var data = await Invoices.query().patchAndFetchById(invoice.id, {
+            data = await Invoices.query().patchAndFetchById(invoice.id, {
                 payment_method,
             });
         }
 
         if (status) {
-            var data = await Invoices.query().patchAndFetchById(invoice.id, {
+            data = await Invoices.query().patchAndFetchById(invoice.id, {
                 status,
             });
         }

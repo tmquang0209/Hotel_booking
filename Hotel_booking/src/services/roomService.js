@@ -1,6 +1,4 @@
-import { deleteRoom } from "../controllers/roomController.js";
 import { errorsCode } from "../enums/errorsCode.js";
-import BookingRooms from "../models/bookingRooms.js";
 import Hotels from "../models/hotels.js";
 import Rooms from "../models/rooms.js";
 import ApiException from "../utils/apiException.js";

@@ -85,7 +85,7 @@ export async function deleteRoom(req, res) {
     try {
         await RoomService.checkAccess(user.id, id);
 
-        const deleteData = await RoomService.deleteRoom(id);
+        await RoomService.deleteRoom(id);
 
         return res.json(apiResponse(1033, true, null));
     } catch (error) {
