@@ -1,0 +1,96 @@
+[debug] [2024-10-09T06:37:17.878Z] ----------------------------------------------------------------------
+[debug] [2024-10-09T06:37:17.880Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\tmqua\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2024-10-09T06:37:17.880Z] CLI Version:   13.22.0
+[debug] [2024-10-09T06:37:17.880Z] Platform:      win32
+[debug] [2024-10-09T06:37:17.880Z] Node Version:  v20.17.0
+[debug] [2024-10-09T06:37:17.880Z] Time:          Wed Oct 09 2024 13:37:17 GMT+0700 (Indochina Time)
+[debug] [2024-10-09T06:37:17.881Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-10-09T06:37:17.886Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-10-09T06:37:17.886Z] > authorizing via signed-in user (tmquang0209@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  D:\FSOFT\socket-firebase\server
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2024-10-09T06:37:43.742Z] Checked if tokens are valid: false, expires at: 1728293787156
+[debug] [2024-10-09T06:37:43.742Z] Checked if tokens are valid: false, expires at: 1728293787156
+[debug] [2024-10-09T06:37:43.742Z] > refreshing access token with scopes: []
+[debug] [2024-10-09T06:37:43.744Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2024-10-09T06:37:43.744Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-10-09T06:37:47.025Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2024-10-09T06:37:47.025Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-10-09T06:37:47.034Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/availableProjects pageSize=100
+[debug] [2024-10-09T06:37:47.881Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/availableProjects 200
+[debug] [2024-10-09T06:37:47.881Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/availableProjects [omitted]
+[debug] [2024-10-09T06:37:58.254Z] ----------------------------------------------------------------------
+[debug] [2024-10-09T06:37:58.256Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\tmqua\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2024-10-09T06:37:58.257Z] CLI Version:   13.22.0
+[debug] [2024-10-09T06:37:58.257Z] Platform:      win32
+[debug] [2024-10-09T06:37:58.257Z] Node Version:  v20.17.0
+[debug] [2024-10-09T06:37:58.257Z] Time:          Wed Oct 09 2024 13:37:58 GMT+0700 (Indochina Time)
+[debug] [2024-10-09T06:37:58.257Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-10-09T06:37:58.261Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-10-09T06:37:58.262Z] > authorizing via signed-in user (tmquang0209@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  D:\FSOFT\socket-firebase\server
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2024-10-09T06:38:11.635Z] Checked if tokens are valid: true, expires at: 1728459466025
+[debug] [2024-10-09T06:38:11.635Z] Checked if tokens are valid: true, expires at: 1728459466025
+[debug] [2024-10-09T06:38:11.636Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2024-10-09T06:38:12.818Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2024-10-09T06:38:12.818Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] i  Using project renthub-b15b8 (linhtinh) 
+[info] 
+=== Firestore Setup
+[debug] [2024-10-09T06:38:17.902Z] Checked if tokens are valid: true, expires at: 1728459466025
+[debug] [2024-10-09T06:38:17.902Z] Checked if tokens are valid: true, expires at: 1728459466025
+[debug] [2024-10-09T06:38:17.902Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/renthub-b15b8/services/firestore.googleapis.com [none]
+[debug] [2024-10-09T06:38:17.902Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/renthub-b15b8/services/firestore.googleapis.com x-goog-quota-user=projects/renthub-b15b8
+[debug] [2024-10-09T06:38:19.482Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/renthub-b15b8/services/firestore.googleapis.com 200
+[debug] [2024-10-09T06:38:19.483Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/renthub-b15b8/services/firestore.googleapis.com [omitted]
+[debug] [2024-10-09T06:38:19.483Z] Checked if tokens are valid: true, expires at: 1728459466025
+[debug] [2024-10-09T06:38:19.483Z] Checked if tokens are valid: true, expires at: 1728459466025
+[debug] [2024-10-09T06:38:19.483Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/renthub-b15b8/databases/(default) [none]
+[debug] [2024-10-09T06:38:19.718Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/renthub-b15b8/databases/(default) 404
+[debug] [2024-10-09T06:38:19.718Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/renthub-b15b8/databases/(default) {"error":{"code":404,"message":"Project 'renthub-b15b8' or database '(default)' does not exist.","status":"NOT_FOUND"}}
+[debug] [2024-10-09T06:38:19.719Z] error getting database type:  HTTP Error: 404, Project 'renthub-b15b8' or database '(default)' does not exist. {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":404,"message":"Project 'renthub-b15b8' or database '(default)' does not exist.","status":"NOT_FOUND"}},"response":{"statusCode":404}},"exit":1,"message":"HTTP Error: 404, Project 'renthub-b15b8' or database '(default)' does not exist.","status":404}
+[info] (default) does not exist in project renthub-b15b8.
+[debug] [2024-10-09T06:38:19.720Z] database_type: DATABASE_DOES_NOT_EXIST
+[debug] [2024-10-09T06:38:29.760Z] Checked if tokens are valid: true, expires at: 1728459466025
+[debug] [2024-10-09T06:38:29.760Z] Checked if tokens are valid: true, expires at: 1728459466025
+[debug] [2024-10-09T06:38:29.761Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/renthub-b15b8/databases/noti [none]
+[debug] [2024-10-09T06:38:29.973Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/renthub-b15b8/databases/noti 404
+[debug] [2024-10-09T06:38:29.974Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/renthub-b15b8/databases/noti {"error":{"code":404,"message":"Project 'renthub-b15b8' or database 'noti' does not exist.","status":"NOT_FOUND"}}
+[debug] [2024-10-09T06:38:29.974Z] error getting database type:  HTTP Error: 404, Project 'renthub-b15b8' or database 'noti' does not exist. {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":404,"message":"Project 'renthub-b15b8' or database 'noti' does not exist.","status":"NOT_FOUND"}},"response":{"statusCode":404}},"exit":1,"message":"HTTP Error: 404, Project 'renthub-b15b8' or database 'noti' does not exist.","status":404}
+[info] noti does not exist in project renthub-b15b8.
+[debug] [2024-10-09T06:38:29.975Z] database_type: DATABASE_DOES_NOT_EXIST

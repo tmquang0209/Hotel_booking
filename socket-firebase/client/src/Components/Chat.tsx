@@ -1,6 +1,6 @@
-import { Alert, Button, Flex, Input, InputRef, message } from "antd";
+import { Alert, Button, Flex, Input, message } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 interface ChatBoxProps {
     data: string[];
@@ -21,64 +21,71 @@ const ChatBox = ({ data }: ChatBoxProps) => {
 
 function ChatComponent() {
     const [messageApi, contextHolder] = message.useMessage();
-    const messageInput = useRef<InputRef>(null);
-    const room = useRef<InputRef>(null);
+    const [messageInput, setMessageInput] = useState<string>("");
+    const [room, setRoom] = useState<string>("");
     const [messages, setMessages] = useState<string[]>([]);
     const [empty, isEmpty] = useState<boolean>(false);
-    const socket = useRef(io("http://localhost:3030")).current;
+    const socket = useRef<Socket | null>(null);
 
+    // Initialize the socket connection only when the component mounts
     useEffect(() => {
-        socket.on("connect", () => {
-            console.log("Connected to server");
-            console.log(socket.id);
+        socket.current = io("http://localhost:3030");
+
+        socket.current.on("connect", () => {
+            console.log("Connected to server", socket.current?.id);
         });
 
-        socket.on("receive-message", (msg: string) => {
+        socket.current.on("receive-message", (msg: string) => {
             setMessages((prev) => [...prev, msg]);
+            messageApi.open({
+                type: "info",
+                content: "New message received!",
+                duration: 3, // Duration in seconds before the message disappears
+            });
         });
 
+        // Handle socket disconnection
+        socket.current.on("disconnect", () => {
+            console.log("Disconnected from server");
+        });
+
+        // Cleanup function to disconnect the socket when the component unmounts
         return () => {
-            socket.off("receive-message");
+            socket.current?.disconnect();
+            console.log("Socket disconnected on component unmount");
         };
-    }, [socket]);
+    }, [messageApi]);
 
     const btnSubmit = () => {
-        if (messageInput.current) {
-            const inbox = messageInput.current.input?.value;
-            const roomId = room.current?.input?.value;
-            if (!inbox) {
-                isEmpty(true);
-                console.log(empty);
-            } else {
-                socket.emit("receive-message", inbox, roomId);
-                if (messageInput.current && messageInput.current.input) {
-                    messageInput.current.input.value = "";
-                }
-                // Show a success message after sending the message
-                messageApi.open({
-                    type: "success",
-                    content: "Message sent successfully!",
-                    duration: 3, // Duration in seconds before the message disappears
-                });
-            }
+        if (!messageInput) {
+            isEmpty(true);
+            console.log(empty);
+        } else {
+            socket.current?.emit("send-message", messageInput, room);
+            setMessages((prevMessages) => [...prevMessages, messageInput]);
+            setMessageInput("");
+            messageApi.open({
+                type: "success",
+                content: "Message sent successfully!",
+                duration: 3,
+            });
         }
+        console.log("🚀 ~ btnSubmit ~ messages:", messages);
     };
 
     const joinRoomBtn = () => {
-        const roomValue = room.current?.input?.value;
-
-        if (roomValue) {
-            socket.emit("join-room", roomValue);
+        if (room) {
+            socket.current?.emit("join-room", room);
             messageApi.open({
                 type: "success",
-                content: `Joined to room ${roomValue} successfully!`,
-                duration: 3, // Duration in seconds before the message disappears
+                content: `Joined to room ${room} successfully!`,
+                duration: 3,
             });
         } else {
             messageApi.open({
                 type: "error",
                 content: "Room ID is empty",
-                duration: 3, // Duration in seconds before the message disappears
+                duration: 3,
             });
         }
     };
@@ -93,7 +100,18 @@ function ChatComponent() {
             <div className="w-[300px] mt-4">
                 {empty && <Alert className="my-2" closable message="Message is required" type="error" showIcon />}
                 <Flex align="center" className="h-10">
-                    <Input name="message" ref={messageInput} onFocus={() => isEmpty(false)} placeholder="Write something..." size="large" />
+                    <Input
+                        name="message"
+                        value={messageInput}
+                        onChange={(e) => {
+                            setMessageInput(e.target.value);
+                            isEmpty(false);
+                        }}
+                        placeholder="Write something..."
+                        size="large"
+                        allowClear
+                        onPressEnter={btnSubmit}
+                    />
                     <Button name="Send" className="ml-2" variant="solid" color="primary" size="large" onClick={btnSubmit}>
                         Send
                     </Button>
@@ -102,7 +120,7 @@ function ChatComponent() {
 
             <div className="w-[300px] mt-6 m-[10px]">
                 <Flex>
-                    <Input placeholder="Enter room id..." ref={room} />
+                    <Input placeholder="Enter room id..." value={room} onChange={(e) => setRoom(e.target.value)} />
                     <Button variant="solid" color="default" className="ml-2" onClick={joinRoomBtn}>
                         Join
                     </Button>

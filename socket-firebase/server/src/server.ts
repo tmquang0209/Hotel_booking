@@ -30,11 +30,11 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
     console.log("A user connected", socket.id);
 
-    socket.on("receive-message", (msg, room) => {
+    socket.on("send-message", (msg, room) => {
         if (room) {
-            io.to(room).emit("receive-message", msg);
+            socket.broadcast.to(room).emit("receive-message", msg);
         } else {
-            io.emit("receive-message", msg);
+            socket.broadcast.emit("receive-message", msg);
         }
     });
 
